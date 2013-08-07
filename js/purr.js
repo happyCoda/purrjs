@@ -9,8 +9,16 @@ var Purr = Purr || {};
 
 
 /*
-* @param item any entity for expose
-* @param name string name of the exposed entity
+* @param {}
+* @param {}
+* @return {}
+*/
+
+
+
+/*
+* @param {any} item Entity for expose
+* @param {string} name The name of the exposed entity
 */
 Purr.expose = function (item, name) {
 	window.exposed = window.exposed || {};
@@ -50,32 +58,37 @@ Purr.cleanScope = function () {
 
 
 /*
-* @param
-* @param
+* @param {array} An array to map through
+* @param {function} fn The function which should be called on each array element
 */
 Purr.map = function (arr, fn) {
+	var i,
+	mappedArr = [];
+
 	if (typeof Array.prototype.map !== 'undefined') {
 		arr.map(fn);
 	} else {
-		var i = arr.length - 1;
+		i = arr.length - 1;
 
-		for (; arr[i]; i--) {
-			fn(arr[i]);
+		for (; arr[i]; i -= 1) {
+			mappedArr.push(fn(arr[i]));
 		}
+
+		return mappedArr;
 	}
 };
 
 
 /*
-* @param
-* @param
-* @return
+* @param {array} arr An array for searching the needle
+* @param {any} needle Entity of any type wich we searching for
+* @return {boolean} res The result of the searching
 */
 Purr.inArray = function (arr, needle) {
 	var i = arr.length - 1,
 	res = false;
 
-	for (; arr[i]; i--) {
+	for (; arr[i]; i -= 1) {
 		if (arr[i] === needle) {
 			res = true;
 		}
@@ -83,6 +96,27 @@ Purr.inArray = function (arr, needle) {
 
 	return res;
 };
+
+
+/*
+* @param {array} arr An array we removing from
+* @param {any} item Entity we're going to remove
+* @return {}
+*/
+Purr.arrayRemove = function (arr, item) {
+	var i = arr.length - 1;
+
+	if (Array.prototype.indexOf !== 'undefined') {
+		arr.splice(arr.indexOf(item), 1);
+	} else {
+		for (; arr[i]; i -= 1) {
+			// TODO: improve it for object items
+			if (arr[i] === item) {
+				arr.splice(i, 1);
+			}
+		}
+	}
+}
 
 /*
 *
