@@ -15,12 +15,19 @@ var Purr = Purr || {};
 */
 
 
+Purr.util = {};
+Purr.array = {};
+Purr.string = {};
+Purr.object = {};
+
 
 /*
+* Makes any object available in global scope
+*
 * @param {any} item Entity for expose
 * @param {string} name The name of the exposed entity
 */
-Purr.expose = function (item, name) {
+Purr.util.expose = function (item, name) {
 	window.exposed = window.exposed || {};
 
 	window.exposed[name] = item;
@@ -30,9 +37,10 @@ Purr.expose = function (item, name) {
 /*
 * 
 */
-Purr.cleanScope = function () {
+Purr.util.cleanScope = function () {
 	var exps,
 	item;
+
 	if (window.exposed) {
 		exps = window.exposed;
 		for (item in exps) {
@@ -58,10 +66,13 @@ Purr.cleanScope = function () {
 
 
 /*
-* @param {array} An array to map through
+* Iterates through array and executes a callback on each item.
+*
+* @param {array} arr An array to map through
 * @param {function} fn The function which should be called on each array element
+* @return {array} mappedArr Changed array.
 */
-Purr.map = function (arr, fn) {
+Purr.array.map = function (arr, fn) {
 	var i,
 	mappedArr = [];
 
@@ -80,11 +91,13 @@ Purr.map = function (arr, fn) {
 
 
 /*
-* @param {array} arr An array for searching the needle
-* @param {any} needle Entity of any type wich we searching for
-* @return {boolean} res The result of the searching
+* Checks wether given item exists in array or not.
+*
+* @param {array} arr An array for searching the needle.
+* @param {any} needle Entity of any type wich we searching for.
+* @return {boolean} res The result of the searching.
 */
-Purr.inArray = function (arr, needle) {
+Purr.array.has = function (arr, needle) {
 	var i = arr.length - 1,
 	res = false;
 
@@ -99,11 +112,13 @@ Purr.inArray = function (arr, needle) {
 
 
 /*
-* @param {array} arr An array we removing from
-* @param {any} item Entity we're going to remove
+* Removes given item from array.
+*
+* @param {array} arr An array we removing from.
+* @param {any} item Entity we're going to remove.
 * @return {}
 */
-Purr.arrayRemove = function (arr, item) {
+Purr.array.remove = function (arr, item) {
 	var i = arr.length - 1;
 
 	if (Array.prototype.indexOf !== 'undefined') {
@@ -116,7 +131,44 @@ Purr.arrayRemove = function (arr, item) {
 			}
 		}
 	}
-}
+};
+
+
+/*
+*
+*/
+Purr.array.intersect = function (arr1, arr2) {};
+
+/*
+* Makes an array from the given arguments.
+*
+* @param {any} arguments Any number of any type arguments.
+* @return {array} res Result array combined of the given arguments.
+*/
+Purr.array.create = function () {
+	var prop, 
+	i = arguments.length - 1,
+	firstArg = arguments[0],
+	res = [];
+
+	if (i > 1) {
+		for (; arguments[i]; i -= 1) {
+
+			res.push(arguments[i]);
+			res.reverse();
+		}
+	} else if (i === 0) {
+		if (Purr.util.getType(firstArg) !== 'Object') {
+			res.push(firstArg);
+		} else {
+			for (prop in firstArg) {
+				res.push(firstArg[prop]);
+			}
+		}
+	}
+
+	return res;
+};
 
 /*
 *
@@ -182,7 +234,7 @@ Purr.randomNum = function (min, max) {
 * @param
 * @return
 */
-Purr.getType = function (obj) {
+Purr.util.getType = function (obj) {
 
 	var toStr = Object.prototype.toString,
 	typeStr = toStr.apply(obj, []),
@@ -222,11 +274,115 @@ Purr.getClass = function (obj) {
 
 };
 
+/*
+* @param {object} Parent Parent class to ingerit from.
+* @param {object} props Functionality to add to our new class.
+* @return {function} Child The new class inherited from Parent.
+*/
+Purr.object.klass = function (Parent, props) {
+	var Child,
+	prop,
+	F,
+	Parent;
+
+	Child = function () {
+		if (Child.uber && Child.uber.hasOwnProperty('_construct')) {
+			Child.uber._construct.apply(this, arguments);
+		}
+
+		if (Child.prototype.hasOwnProperty('_construct')) {
+			Child.prototype._construct.apply(this, arguments);
+		}
+	};
+
+	
+
+	F = function () {};
+	Parent = Parent || {};
+	F.prototype = Parent.prototype;
+	Child.prototype = new F();
+	Child.prototype.constructor = Child;
+	Child.uber = Parent.prototype;
+
+	for (prop in props) {
+		Child.prototype[prop] = props[prop];
+	}
+
+	return Child;
+};
+
+/*
+* Extends one object by another.
+*
+* @param {object} recipient Object which will be extended.
+* @param {object} donator Object by which will be do extension.
+* @return {object} recipient Extended object.
+*/
+Purr.object.extend = function (recipient, donator) {
+	var prop,
+	i;
+
+	for (prop in donator) {
+
+		if (donator.hasOwnProperty(prop)) {
+
+			if (typeof donator[prop] === 'object') {
+				recipient[prop] = (Purr.util.getType(donator[prop]) === 'Object') ? {} : [];
+
+				Purr.object.extend(recipient[prop], donator[prop]);
+			} else {
+				recipient[prop] = donator[prop];
+			}
+
+			// if (Purr.util.getType(donator[prop]) !== 'Object') {
+
+			// 	if (Purr.util.getType(donator[prop]) !== 'Array') {
+			// 		recipient[prop] = donator[prop];
+			// 		continue;
+
+			// 	} else {
+			// 		recipient[prop] = [];
+			// 	}
+				
+			// } else {
+			// 	recipient[prop] = {};
+			// }
+
+			// Purr.object.extend(recipient[prop], donator[prop]);
+		}
+	}
+
+	return recipient;
+};
+
+
+/*
+* Extends object by the given functionality. Multiple inheritance.
+*
+* @param {object} any Any number of arguments with object type.
+* @return {object} recipient Object extended with mixins.
+*/
+Purr.object.mixin = function () {
+	var slice = Array.prototype.slice,
+	recipient = arguments[0],
+	mixins = slice.call(arguments, 1),
+	i = mixins.length - 1,
+	prop;
+
+	for (; mixins[i]; i -= 1) {
+		for (prop in mixins[i]) {
+			recipient[prop] = mixins[i][prop];
+		}
+	}
+
+	return recipient;
+}
+
 
 /*
 * @param
 */
-Purr.objectDump = function (obj) {
+Purr.object.dump = function (obj) {
 	var objStr = '{',
 	prop;
 
