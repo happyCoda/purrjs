@@ -86,10 +86,47 @@ Purr.MVC.view.prototype.init = function () {};
 Purr.MVC.view.prototype.listen = function (msg) {};
 
 Purr.MVC.tpl = {
+
+	loopPattern: /\{for\s\$(\w*)\sin\s\$(\w*)\}(.*)\{endfor\}/gi,
+
+	varPattern: /\{\{\$(\w*)\}\}/gi,
+
 	parse: function (tpl, data) {
-		var res = tpl.replace(/\{\$(\w*)\}/gi, function (m, cg1) {
-			return tpl.replace(m, 'foo');
+
+		var self = this,
+		formatedTpl = self.format(tpl),
+		root,
+		loopBody,
+		filledLoop = '',
+		res;
+
+		res = formatedTpl.replace(self.loopPattern, function (m, cg1, cg2, cg3) {
+			loopBody = cg3;
+
+			data.forEach(function (item) {
+				filledLoop += self.fillString(loopBody, item);
+			});
+
+			return filledLoop;
 		});
+
 		return res;
-	}
+	},
+
+	format: function (tpl) {
+		var formatedTpl = tpl.replace(/\n|\r|\t/gi, '');
+
+		return formatedTpl;
+	},
+
+	fillString: function (str, data) {
+		var self = this,
+		filledString;
+
+		filledString = str.replace(self.varPattern, function (m, cg) {
+			return data[cg];
+		});
+
+		return filledString;
+	} 
 };

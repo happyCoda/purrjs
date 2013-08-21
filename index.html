@@ -40,7 +40,9 @@
 	<script class="tpl" type="javascript/template">
 		<select name="cars" id="carId" class="carSelect">
 			<option value="">Choose a make</option>
-			<option value="1">{$make}</option>
+			{for $make in $data}
+				<option value="{{$makeId}}">{{$make}}</option>
+			{endfor}
 		</select>
 	</script>
 </body>
