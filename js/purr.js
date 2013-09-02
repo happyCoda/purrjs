@@ -135,9 +135,31 @@ Purr.array.remove = function (arr, item) {
 
 
 /*
+* Searches an intersection between two arrays.
 *
+* @param {array} arr1 First array to search.
+* @param {array} arr2 Second array to search.
+* @param {array} arrIntersect An array or intersection results.
 */
-Purr.array.intersect = function (arr1, arr2) {};
+Purr.array.intersect = function (arr1, arr2) {
+	var arrIntersect = [],
+	arr1Len,
+	arr2Len;
+
+	for (arr1Len = arr1.length - 1; arr1[arr1Len]; arr1Len--) {
+		for (arr2Len = arr2.length - 1; arr2[arr2Len]; arr2Len--) {
+			
+			if (arr1[arr1Len] === arr2[arr2Len] && !Purr.array.has(arrIntersect, arr1[arr1Len]) && !Purr.array.has(arrIntersect, arr2[arr2Len])) {
+				
+				arrIntersect.push(arr1[arr1Len]);
+			}
+		}
+	}
+
+	return arrIntersect;
+
+
+};
 
 /*
 * Makes an array from the given arguments.
