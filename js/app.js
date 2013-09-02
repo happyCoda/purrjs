@@ -4,14 +4,14 @@ CarSelectorController = Purr.MVC.controller({
 	model: CarSelectorModel,
 	view: CarSelectorView
 }),
-makes = [{Ford: ['Mustang', 'Focus']}, {MersedesBenz: ['SLK']}, {Toyota: ['Corolla']}];
+data = [{make: 'Ford', makeId: 1, models: ['Mustang', 'Focus']}, {make: 'MersedesBenz', makeId: 2, models: ['SLK']}, {make: 'Toyota', makeId: 3, models: ['Corolla']}];
 
 
 
 $(function () {
 	var tpl = $('.tpl').text();
 
-	console.log(Purr.MVC.tpl.parse(tpl));
+	console.log('parsed tpl', Purr.MVC.tpl.parse(tpl, data));
 });
 
 
