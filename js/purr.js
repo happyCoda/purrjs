@@ -65,6 +65,89 @@ Purr.util.cleanScope = function () {
 };
 
 
+Purr.list = function (arr) {
+	if (!(this instanceof Purr.list) ) {
+		var instance = new Purr.list();
+		return instance;
+	}
+	this.rawArray = arr;
+};
+
+
+
+Purr.list.create = function (arr) {
+	var purrArray = new Purr.list(arr);
+	return purrArray;
+};
+
+Purr.list.prototype.getRawArray = function () {
+	return this.rawArray;
+};
+
+Purr.list.prototype.map = function () {};
+Purr.list.prototype.reduce = function () {};
+Purr.list.prototype.index = function () {};
+Purr.list.prototype.filter = function () {};
+Purr.list.prototype.forEach = function () {};
+Purr.list.prototype.count = function () {};
+Purr.list.prototype.get = function () {};
+Purr.list.prototype.add = function () {};
+Purr.list.prototype.remove = function () {};
+Purr.list.prototype.slice = function () {};
+Purr.list.prototype.intersect = function () {};
+Purr.list.prototype.diff = function () {};
+Purr.list.prototype.union = function () {};
+Purr.list.prototype.some = function () {};
+Purr.list.prototype.every = function () {};
+
+
+Purr.klass = function (obj) {
+	var prop;
+
+	if (!(this instanceof Purr.klass) ) {
+		var instance = new Purr.klass();
+		return instance;
+	}
+
+	for (prop in obj) {
+		this[prop] = obj[prop];
+	}
+};
+
+Purr.klass.create = function (obj) {
+	var purrObj = new Purr.klass(obj);
+	return purrObj;
+};
+
+/*Purr.klass.prototype.create = function () {
+	var Child = function () {},
+	F = function () {};
+	F.prototype = this;
+	Child.prototype = new F();
+	return Child;
+};*/
+
+Purr.klass.prototype.extend = function () {
+	var argLen = arguments.length - 1,
+	loop = function (ctx, loopObj) {
+		var prop;
+
+		for (prop in loopObj) {
+			ctx[prop] = loopObj[prop];
+		}
+	};
+
+	if (argLen > 1) {
+		for (;arguments[argLen]; argLen--) {
+			loop(this, arguments[argLen]);
+		}
+	} else {
+		loop(this, arguments[argLen]);
+	}
+};
+
+
+
 /*
 * Iterates through array and executes a callback on each item.
 *
