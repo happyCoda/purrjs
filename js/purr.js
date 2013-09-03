@@ -70,7 +70,7 @@ Purr.list = function (arr) {
 		var instance = new Purr.list();
 		return instance;
 	}
-	this.rawArray = arr;
+	this.rawArray = arr || [];
 };
 
 
@@ -84,21 +84,220 @@ Purr.list.prototype.getRawArray = function () {
 	return this.rawArray;
 };
 
-Purr.list.prototype.map = function () {};
+Purr.list.prototype.map = function (fn) {
+	var self = this,
+	len,
+	mappedArray = [];
+	if (typeof Array.prototype.map !== 'function') {
+		for (len = self.rawArray.length; len--;) {
+			mappedArray.push(fn(self.rawArray[len], len));
+		}
+	} else {
+		mappedArray = self.rawArray.map(fn);
+	}
+
+	return mappedArray;
+};
+
 Purr.list.prototype.reduce = function () {};
-Purr.list.prototype.index = function () {};
+
+Purr.list.prototype.index = function (item) {
+	var self = this,
+	len,
+	itemIndex = -1;
+
+	if (typeof Array.prototype.indexOf !== 'function') {
+		for (len = self.rawArray.length; len--;) {
+			if (self.rawArray[len] === item) {
+				itemIndex = len;
+				break;
+			}
+		}
+	} else {
+		itemIndex = self.rawArray.indexOf(item);
+	}
+
+
+	return itemIndex;
+};
 Purr.list.prototype.filter = function () {};
 Purr.list.prototype.forEach = function () {};
-Purr.list.prototype.count = function () {};
-Purr.list.prototype.get = function () {};
-Purr.list.prototype.add = function () {};
-Purr.list.prototype.remove = function () {};
-Purr.list.prototype.slice = function () {};
-Purr.list.prototype.intersect = function () {};
-Purr.list.prototype.diff = function () {};
-Purr.list.prototype.union = function () {};
-Purr.list.prototype.some = function () {};
+
+
+Purr.list.prototype.count = function (item) {
+	var self = this,
+	len,
+	duplicatesArray = [],
+	count;
+
+	for (len = self.rawArray.length; len--;) {
+		if (self.rawArray[len] === item) {
+			duplicatesArray.push(self.rawArray[len]);
+		}
+	}
+
+	count = duplicatesArray.length;
+
+	return count;
+};
+
+Purr.list.prototype.get = function (index) {
+	var self = this;
+
+	return self.rawArray[index];
+};
+Purr.list.prototype.add = function () {
+	var self = this,
+	len;
+
+	for (len = arguments.length; len--;) {
+		self.rawArray.push(arguments[len]);
+	}
+
+	return self;
+};
+
+
+Purr.list.prototype.remove = function () {
+	var self = this,
+	len,
+	removeLogic = function (item) {
+		var itemIndex,
+		leftPos,
+		leftSlice,
+		rightPos,
+		rightSlice,
+		unionSlice;
+
+
+		itemIndex = self.index(item);
+
+		if (itemIndex === 0) {
+			self.slice(itemIndex + 1);
+		} else {
+
+			leftPos = 0;
+			leftSlice = self.slice(leftPos, itemIndex);
+			rightPos = itemIndex + 1;
+			rightSlice = self.slice(rightPos);
+			unionSlice = leftSlice.union(rightSlice);
+			self.rawArray = unionSlice.rawArray;
+		}
+	};
+
+	if (arguments.length > 1) {
+		for (len = arguments.length; len--;) {
+			removeLogic(arguments[len]);
+		}
+	} else {
+		removeLogic(arguments[0]);
+	}
+		
+
+	return self;
+
+};
+
+Purr.list.prototype.slice = function (left, right) {
+	var self = this,
+	slicedArray,
+	slicedList;
+
+	if (!right) {
+		right = self.rawArray.length;
+	}
+
+	slicedArray = self.rawArray.slice(left, right);
+	slicedList = Purr.list.create(slicedArray);
+	return slicedList;
+};
+
+Purr.list.prototype.intersect = function (list) {
+	var self = this,
+	selfArrayLen,
+	listArrayLen,
+	intersectList = Purr.list.create([]);
+
+	for (selfArrayLen = self.rawArray.length; selfArrayLen--;) {
+		for (listArrayLen = list.rawArray.length; listArrayLen--;) {
+			if (self.rawArray[selfArrayLen] === list.rawArray[listArrayLen]) {
+				if (intersectList.index(self.rawArray[selfArrayLen]) === -1) {
+					intersectList.add(self.rawArray[selfArrayLen]);
+				}
+				
+			}
+		}
+	}
+
+	return intersectList;
+
+};
+Purr.list.prototype.diff = function (list) {
+	var self = this,
+	selfArrayLen,
+	listArrayLen,
+	diffList = Purr.list.create([]);
+
+	for (selfArrayLen = self.rawArray.length; selfArrayLen--;) {
+		for (listArrayLen = list.rawArray.length; listArrayLen--;) {
+			if (self.rawArray[selfArrayLen] !== list.rawArray[listArrayLen]) {
+				if (diffList.index(self.rawArray[selfArrayLen]) === -1) {
+					diffList.add(self.rawArray[selfArrayLen]);
+				}
+				
+			}
+		}
+	}
+
+	return diffList;
+};
+Purr.list.prototype.union = function (list) {
+	var self = this,
+	unionList;
+
+	unionList = Purr.list.create(self.rawArray.concat(list.rawArray));
+
+	return unionList;
+
+};
+
+Purr.list.prototype.some = function (fn) {
+	var self = this,
+	len,
+	res = false;
+
+
+	if (typeof Array.prototype.some !== 'function') {
+		for (len = self.rawArray.length; len--;) {
+			if (fn(self.rawArray[len])) {
+				res = true;
+				break;
+			}
+		}
+	} else {
+		res = self.rawArray.some(fn);
+	}
+
+	return res;
+};
 Purr.list.prototype.every = function () {};
+Purr.list.prototype.uniq = function () {
+	var self = this,
+	len,
+	uniqsArray = [],
+	purrUniqsList;
+
+	purrUniqsList = Purr.list.create(uniqsArray);
+
+	for (len = self.rawArray.length; len--;) {
+
+		if (purrUniqsList.index(self.rawArray[len]) === -1) {
+			uniqsArray.push(self.rawArray[len]);
+		}
+	}
+
+	return uniqsArray;
+};
 
 
 Purr.klass = function (obj) {
