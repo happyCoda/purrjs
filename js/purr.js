@@ -71,6 +71,7 @@ Purr.list = function (arr) {
 		return instance;
 	}
 	this.rawArray = arr || [];
+	this.length = this.rawArray.length;
 };
 
 
@@ -89,7 +90,7 @@ Purr.list.prototype.map = function (fn) {
 	len,
 	mappedArray = [];
 	if (typeof Array.prototype.map !== 'function') {
-		for (len = self.rawArray.length; len--;) {
+		for (len = self.length; len--;) {
 			mappedArray.push(fn(self.rawArray[len], len));
 		}
 	} else {
@@ -107,7 +108,7 @@ Purr.list.prototype.index = function (item) {
 	itemIndex = -1;
 
 	if (typeof Array.prototype.indexOf !== 'function') {
-		for (len = self.rawArray.length; len--;) {
+		for (len = self.length; len--;) {
 			if (self.rawArray[len] === item) {
 				itemIndex = len;
 				break;
@@ -120,8 +121,28 @@ Purr.list.prototype.index = function (item) {
 
 	return itemIndex;
 };
-Purr.list.prototype.filter = function () {};
-Purr.list.prototype.forEach = function () {};
+
+Purr.list.prototype.filter = function (fn) {
+	var self = this,
+	len,
+	filteredList = Purr.list.create();
+};
+
+Purr.list.prototype.forEach = function (fn) {
+	var self = this,
+	len;
+
+	if (typeof Array.prototype.foreEach !== 'function') {
+		for (len = self.length; len--;) {
+			fn(self.rawArray(len), len);
+		}
+	} else {
+		self.rawArray.forEach(fn);
+	}
+	
+
+	return self;
+};
 
 
 Purr.list.prototype.count = function (item) {
@@ -130,7 +151,7 @@ Purr.list.prototype.count = function (item) {
 	duplicatesArray = [],
 	count;
 
-	for (len = self.rawArray.length; len--;) {
+	for (len = self.length; len--;) {
 		if (self.rawArray[len] === item) {
 			duplicatesArray.push(self.rawArray[len]);
 		}
@@ -204,7 +225,7 @@ Purr.list.prototype.slice = function (left, right) {
 	slicedList;
 
 	if (!right) {
-		right = self.rawArray.length;
+		right = self.length;
 	}
 
 	slicedArray = self.rawArray.slice(left, right);
@@ -216,10 +237,10 @@ Purr.list.prototype.intersect = function (list) {
 	var self = this,
 	selfArrayLen,
 	listArrayLen,
-	intersectList = Purr.list.create([]);
+	intersectList = Purr.list.create();
 
-	for (selfArrayLen = self.rawArray.length; selfArrayLen--;) {
-		for (listArrayLen = list.rawArray.length; listArrayLen--;) {
+	for (selfArrayLen = self.length; selfArrayLen--;) {
+		for (listArrayLen = list.length; listArrayLen--;) {
 			if (self.rawArray[selfArrayLen] === list.rawArray[listArrayLen]) {
 				if (intersectList.index(self.rawArray[selfArrayLen]) === -1) {
 					intersectList.add(self.rawArray[selfArrayLen]);
@@ -238,8 +259,8 @@ Purr.list.prototype.diff = function (list) {
 	listArrayLen,
 	diffList = Purr.list.create([]);
 
-	for (selfArrayLen = self.rawArray.length; selfArrayLen--;) {
-		for (listArrayLen = list.rawArray.length; listArrayLen--;) {
+	for (selfArrayLen = self.length; selfArrayLen--;) {
+		for (listArrayLen = list.length; listArrayLen--;) {
 			if (self.rawArray[selfArrayLen] !== list.rawArray[listArrayLen]) {
 				if (diffList.index(self.rawArray[selfArrayLen]) === -1) {
 					diffList.add(self.rawArray[selfArrayLen]);
@@ -268,7 +289,7 @@ Purr.list.prototype.some = function (fn) {
 
 
 	if (typeof Array.prototype.some !== 'function') {
-		for (len = self.rawArray.length; len--;) {
+		for (len = self.length; len--;) {
 			if (fn(self.rawArray[len])) {
 				res = true;
 				break;
@@ -280,7 +301,26 @@ Purr.list.prototype.some = function (fn) {
 
 	return res;
 };
-Purr.list.prototype.every = function () {};
+
+Purr.list.prototype.every = function (fn) {
+	var self = this,
+	len,
+	res = true;
+
+
+	if (typeof Array.prototype.some !== 'function') {
+		for (len = self.length; len--;) {
+			if (!fn(self.rawArray[len])) {
+				res = false;
+				break;
+			}
+		}
+	} else {
+		res = self.rawArray.filter(fn);
+	}
+
+	return res;
+};
 Purr.list.prototype.uniq = function () {
 	var self = this,
 	len,
@@ -289,7 +329,7 @@ Purr.list.prototype.uniq = function () {
 
 	purrUniqsList = Purr.list.create(uniqsArray);
 
-	for (len = self.rawArray.length; len--;) {
+	for (len = self.length; len--;) {
 
 		if (purrUniqsList.index(self.rawArray[len]) === -1) {
 			uniqsArray.push(self.rawArray[len]);

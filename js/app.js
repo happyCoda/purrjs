@@ -15,6 +15,12 @@ $(function () {
 });
 
 
+var a1 = ['Berlin', 'Zurich', 'Antverpen', 'Brugge', 'Monaco', 'Prague'];
+
+a1 = Purr.list.create(a1);
+
+console.log(a1.length);
+
 
 
 
