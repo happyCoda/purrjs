@@ -21,6 +21,4 @@ a1 = Purr.list.create(a1);
 
 console.log(a1.length);
 
-
-
-
+console.log(Purr.util.cast([], 'String'));

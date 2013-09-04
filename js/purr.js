@@ -595,6 +595,28 @@ Purr.util.getType = function (obj) {
 	return typeRes;
 };
 
+Purr.util.cast = function (item, type) {
+	var casted;
+
+	switch (type) {
+		case 'Boolean':
+			casted = !!item;
+			break;
+		case 'Int':
+			casted = parseInt(item, 10);
+			break;
+		case 'String':
+			casted = Object.prototype.toString.call(item);
+			break;
+		default:
+			casted = item;
+			break;
+
+	}
+
+	return casted;
+};
+
 
 /*
 * @param
