@@ -72,6 +72,7 @@ Purr.list = function (arr) {
 	}
 	this.rawArray = arr || [];
 	this.length = this.rawArray.length;
+	this.klass = Purr.list;
 };
 
 
