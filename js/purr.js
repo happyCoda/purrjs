@@ -20,6 +20,8 @@ Purr.array = {};
 Purr.string = {};
 Purr.object = {};
 
+// TODO: this method should be creating new modules in library
+Purr.namespace = function () {};
 
 /*
 * Makes any object available in global scope
@@ -64,7 +66,7 @@ Purr.util.cleanScope = function () {
 	}
 };
 
-
+// TODO: make an self invoking function here to create closure and contain reference to this in it
 Purr.list = function (arr) {
 	if (!(this instanceof Purr.list) ) {
 		var instance = new Purr.list();
