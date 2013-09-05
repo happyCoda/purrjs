@@ -131,11 +131,21 @@ Purr.list.prototype.map = function (fn) {
 Purr.list.prototype.reduce = function (fn) {
 	var self = this,
 	len,
-	res;
+	res = []; 
+
+	self.reverse();
 
 	for (len = self.length; len--) {
-
+		res.push(fn(self.get(len), self.get(len-1)));
 	}
+};
+
+Purr.list.prototype.reverse = function () {
+	var self = this;
+
+	self.rawArray.reverse();
+
+	return self;
 };
 
 Purr.list.prototype.index = function (item) {
@@ -162,6 +172,18 @@ Purr.list.prototype.filter = function (fn) {
 	var self = this,
 	len,
 	filteredList = Purr.list.create();
+
+	if (typeof Array.prototype.filter === 'undefined') {
+		for (len = self.length; len--;) {
+			if (fn(self.get(len)) {
+				filteredList.add(self.get(len));
+			}
+		}
+	} else {
+		filteredList.rawArray = self.rawArray.filter(fn);
+	}
+
+	return filteredList;
 };
 
 Purr.list.prototype.forEach = function (fn) {
@@ -170,7 +192,7 @@ Purr.list.prototype.forEach = function (fn) {
 
 	if (typeof Array.prototype.foreEach !== 'function') {
 		for (len = self.length; len--;) {
-			fn(self.rawArray(len), len);
+			fn(self.get(len), len);
 		}
 	} else {
 		self.rawArray.forEach(fn);
@@ -189,7 +211,7 @@ Purr.list.prototype.count = function (item) {
 
 	for (len = self.length; len--;) {
 		if (self.rawArray[len] === item) {
-			duplicatesArray.push(self.rawArray[len]);
+			duplicatesArray.push(self.get(len));
 		}
 	}
 
@@ -317,9 +339,9 @@ Purr.list.prototype.intersect = function (list) {
 
 	for (selfArrayLen = self.length; selfArrayLen--;) {
 		for (listArrayLen = list.length; listArrayLen--;) {
-			if (self.rawArray[selfArrayLen] === list.rawArray[listArrayLen]) {
-				if (intersectList.index(self.rawArray[selfArrayLen]) === -1) {
-					intersectList.add(self.rawArray[selfArrayLen]);
+			if (self.get(selfArrayLen) === list.get(listArrayLen)) {
+				if (intersectList.index(self.get(selfArrayLen)) === -1) {
+					intersectList.add(self.get(selfArrayLen));
 				}
 				
 			}
@@ -337,9 +359,9 @@ Purr.list.prototype.diff = function (list) {
 
 	for (selfArrayLen = self.length; selfArrayLen--;) {
 		for (listArrayLen = list.length; listArrayLen--;) {
-			if (self.rawArray[selfArrayLen] !== list.rawArray[listArrayLen]) {
-				if (diffList.index(self.rawArray[selfArrayLen]) === -1) {
-					diffList.add(self.rawArray[selfArrayLen]);
+			if (self.get(selfArrayLen) !== list.get(listArrayLen)) {
+				if (diffList.index(self.get(selfArrayLen)) === -1) {
+					diffList.add(self.get(selfArrayLen));
 				}
 				
 			}
@@ -366,7 +388,7 @@ Purr.list.prototype.some = function (fn) {
 
 	if (typeof Array.prototype.some !== 'function') {
 		for (len = self.length; len--;) {
-			if (fn(self.rawArray[len])) {
+			if (fn(self.get(len))) {
 				res = true;
 				break;
 			}
@@ -386,7 +408,7 @@ Purr.list.prototype.every = function (fn) {
 
 	if (typeof Array.prototype.some !== 'function') {
 		for (len = self.length; len--;) {
-			if (!fn(self.rawArray[len])) {
+			if (!fn(self.get(len))) {
 				res = false;
 				break;
 			}
@@ -397,6 +419,7 @@ Purr.list.prototype.every = function (fn) {
 
 	return res;
 };
+
 Purr.list.prototype.uniq = function () {
 	var self = this,
 	len,
@@ -407,13 +430,34 @@ Purr.list.prototype.uniq = function () {
 
 	for (len = self.length; len--;) {
 
-		if (purrUniqsList.index(self.rawArray[len]) === -1) {
-			uniqsArray.push(self.rawArray[len]);
+		if (purrUniqsList.index(self.get(len) === -1) {
+			uniqsArray.push(self.get(len));
 		}
 	}
 
 	return uniqsArray;
 };
+
+Purr.list.prototype.clone = function () {
+	var self = this,
+	len,
+	clonedList = Purr.list.create(),
+	type;
+
+	for (len = self.length; len--;) {
+		type = Purr.util.getType(self.get(len));
+		if (type !== 'Object' && type !== 'Array') {
+			clonedList.add(self.get(len));
+		} else {
+			// clonedList.add(self.clone(Purr.list.create(self.get(len))).rawArray);
+		}
+		
+	}
+
+	return clonedList;
+};
+
+Purr.list.prototype.extend = function () {};
 
 
 Purr.klass = function (obj) {
