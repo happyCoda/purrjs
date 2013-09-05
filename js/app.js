@@ -19,6 +19,6 @@ var a1 = ['Berlin', 'Zurich', 'Antverpen', 'Brugge', 'Monaco', 'Prague'];
 
 a1 = Purr.list.create(a1);
 
-console.log(a1.length);
+// a1.removeFirst();
 
-console.log(Purr.util.cast([], 'String'));
+console.log(a1.removeFirst());

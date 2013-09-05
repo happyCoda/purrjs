@@ -20,8 +20,33 @@ Purr.array = {};
 Purr.string = {};
 Purr.object = {};
 
-// TODO: this method should be creating new modules in library
-Purr.namespace = function () {};
+
+/*
+* @param {string} nsstring String representation of the desired namespace
+* @return {object} self Returning Purr object for chaining purposes
+*/
+Purr.namespace = function (nsstring) {
+	var names = nsstring.split('.'),
+	self = this,
+	len,
+	parent = self;
+
+	if (names[0] === 'Purr') {
+		names.shift();
+	}
+
+	names.reverse();
+
+	for (len = names.length; len--;) {
+		if (!parent[names[len]]) {
+			parent[names[len]] = {};
+		}
+		
+		parent = parent[names[len]];
+	}
+
+	return self;
+};
 
 /*
 * Makes any object available in global scope
@@ -103,7 +128,15 @@ Purr.list.prototype.map = function (fn) {
 	return mappedArray;
 };
 
-Purr.list.prototype.reduce = function () {};
+Purr.list.prototype.reduce = function (fn) {
+	var self = this,
+	len,
+	res;
+
+	for (len = self.length; len--) {
+
+	}
+};
 
 Purr.list.prototype.index = function (item) {
 	var self = this,
@@ -170,6 +203,7 @@ Purr.list.prototype.get = function (index) {
 
 	return self.rawArray[index];
 };
+
 Purr.list.prototype.add = function () {
 	var self = this,
 	len;
@@ -180,6 +214,21 @@ Purr.list.prototype.add = function () {
 
 	return self;
 };
+
+Purr.list.prototype.addFirst = function () {
+	var self = this,
+	slice = Array.prototype.slice,
+	elements = slice.call(arguments, null),
+	len;
+
+	elements.reverse();
+
+	for (len = elements.length; len--;) {
+		self.rawArray.unshift(elements[len]);
+	}
+
+	return self;
+}
 
 
 Purr.list.prototype.remove = function () {
@@ -197,7 +246,7 @@ Purr.list.prototype.remove = function () {
 		itemIndex = self.index(item);
 
 		if (itemIndex === 0) {
-			self.slice(itemIndex + 1);
+			self.rawArray = self.slice(itemIndex + 1).rawArray;
 		} else {
 
 			leftPos = 0;
@@ -216,10 +265,34 @@ Purr.list.prototype.remove = function () {
 	} else {
 		removeLogic(arguments[0]);
 	}
-		
+
+	self.length -= arguments.length;
 
 	return self;
 
+};
+
+
+Purr.list.prototype.removeFirst = function () {
+	var self = this,
+	len = self.length,
+	itemToRemove = self.get(0);
+
+	self.remove(itemToRemove);
+
+	return self;
+};
+
+
+
+Purr.list.prototype.removeLast = function () {
+	var self = this,
+	len = self.length,
+	itemToRemove = self.get(len-1);
+
+	self.remove(itemToRemove);
+
+	return self;
 };
 
 Purr.list.prototype.slice = function (left, right) {
