@@ -17,8 +17,8 @@ $(function () {
 
 var a1 = ['Berlin', 'Zurich', 'Antverpen', 'Brugge', 'Monaco', 'Prague'];
 
-a1 = Purr.list.create(a1);
+a1 = Purr.list(a1);
 
-// a1.removeFirst();
-
-console.log(a1.removeFirst());
+//a1.removeFirst();
+a1.remove('Zurich', 'Monaco');
+console.log(Purr.util.isArray(a1.getRawArray()));

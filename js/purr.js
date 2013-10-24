@@ -94,7 +94,7 @@ Purr.util.cleanScope = function () {
 // TODO: make an self invoking function here to create closure and contain reference to this in it
 Purr.list = function (arr) {
 	if (!(this instanceof Purr.list) ) {
-		var instance = new Purr.list();
+		var instance = new Purr.list(arr);
 		return instance;
 	}
 	this.rawArray = arr || [];
@@ -105,13 +105,21 @@ Purr.list = function (arr) {
 
 
 Purr.list.create = function (arr) {
-	var purrArray = new Purr.list(arr);
+	var self = this,
+	purrArray = self(arr);
 	return purrArray;
 };
 
 Purr.list.prototype.getRawArray = function () {
 	return this.rawArray;
 };
+
+/*
+* Iterates through array and executes a callback on each item.
+*
+* @param {function} fn The function which should be called on each array element
+* @return {array} mappedArr Changed array.
+*/
 
 Purr.list.prototype.map = function (fn) {
 	var self = this,
@@ -135,7 +143,7 @@ Purr.list.prototype.reduce = function (fn) {
 
 	self.reverse();
 
-	for (len = self.length; len--) {
+	for (len = self.length; len--;) {
 		res.push(fn(self.get(len), self.get(len-1)));
 	}
 };
@@ -175,7 +183,7 @@ Purr.list.prototype.filter = function (fn) {
 
 	if (typeof Array.prototype.filter === 'undefined') {
 		for (len = self.length; len--;) {
-			if (fn(self.get(len)) {
+			if (fn(self.get(len))) {
 				filteredList.add(self.get(len));
 			}
 		}
@@ -252,7 +260,12 @@ Purr.list.prototype.addFirst = function () {
 	return self;
 }
 
-
+/*
+* Removes given item from array.
+*
+* @param {any} any Entity we're going to remove.
+* @return {object} self Current instance of Purr.list
+*/
 Purr.list.prototype.remove = function () {
 	var self = this,
 	len,
@@ -331,6 +344,12 @@ Purr.list.prototype.slice = function (left, right) {
 	return slicedList;
 };
 
+/*
+* Searches an intersection between two arrays.
+*
+* @param {object} list An instance of Purr.list to search.
+* @param {object} intersectList An instance of Purr.list with intersections.
+*/
 Purr.list.prototype.intersect = function (list) {
 	var self = this,
 	selfArrayLen,
@@ -430,7 +449,7 @@ Purr.list.prototype.uniq = function () {
 
 	for (len = self.length; len--;) {
 
-		if (purrUniqsList.index(self.get(len) === -1) {
+		if (purrUniqsList.index(self.get(len) === -1)) {
 			uniqsArray.push(self.get(len));
 		}
 	}
@@ -458,6 +477,31 @@ Purr.list.prototype.clone = function () {
 };
 
 Purr.list.prototype.extend = function () {};
+
+
+Purr.string = function (str) {
+	if (!(this instanceof Purr.string)) {
+		return new Purr.string(str); 
+	}
+
+	this.rawString = str || '';
+	this.length = this.rawString.length;
+	this.klass = Purr.string;
+};
+
+Purr.string.create = function (str) {
+	var self = this,
+	purrString = self(str);
+
+	return purrString;
+};
+
+Purr.string.format = function (str, vars) {};
+
+Purr.string.prototype.trim = function () {};
+Purr.string.prototype.trimLeft = function () {};
+Purr.string.prototype.trimRight = function () {};
+
 
 
 Purr.klass = function (obj) {
@@ -506,32 +550,6 @@ Purr.klass.prototype.extend = function () {
 };
 
 
-
-/*
-* Iterates through array and executes a callback on each item.
-*
-* @param {array} arr An array to map through
-* @param {function} fn The function which should be called on each array element
-* @return {array} mappedArr Changed array.
-*/
-Purr.array.map = function (arr, fn) {
-	var i,
-	mappedArr = [];
-
-	if (typeof Array.prototype.map !== 'undefined') {
-		arr.map(fn);
-	} else {
-		i = arr.length - 1;
-
-		for (; arr[i]; i -= 1) {
-			mappedArr.push(fn(arr[i]));
-		}
-
-		return mappedArr;
-	}
-};
-
-
 /*
 * Checks wether given item exists in array or not.
 *
@@ -553,55 +571,6 @@ Purr.array.has = function (arr, needle) {
 };
 
 
-/*
-* Removes given item from array.
-*
-* @param {array} arr An array we removing from.
-* @param {any} item Entity we're going to remove.
-* @return {}
-*/
-Purr.array.remove = function (arr, item) {
-	var i = arr.length - 1;
-
-	if (Array.prototype.indexOf !== 'undefined') {
-		arr.splice(arr.indexOf(item), 1);
-	} else {
-		for (; arr[i]; i -= 1) {
-			// TODO: improve it for object items
-			if (arr[i] === item) {
-				arr.splice(i, 1);
-			}
-		}
-	}
-};
-
-
-/*
-* Searches an intersection between two arrays.
-*
-* @param {array} arr1 First array to search.
-* @param {array} arr2 Second array to search.
-* @param {array} arrIntersect An array or intersection results.
-*/
-Purr.array.intersect = function (arr1, arr2) {
-	var arrIntersect = [],
-	arr1Len,
-	arr2Len;
-
-	for (arr1Len = arr1.length - 1; arr1[arr1Len]; arr1Len--) {
-		for (arr2Len = arr2.length - 1; arr2[arr2Len]; arr2Len--) {
-			
-			if (arr1[arr1Len] === arr2[arr2Len] && !Purr.array.has(arrIntersect, arr1[arr1Len]) && !Purr.array.has(arrIntersect, arr2[arr2Len])) {
-				
-				arrIntersect.push(arr1[arr1Len]);
-			}
-		}
-	}
-
-	return arrIntersect;
-
-
-};
 
 /*
 * Makes an array from the given arguments.
@@ -695,8 +664,10 @@ Purr.randomNum = function (min, max) {
 
 
 /*
-* @param
-* @return
+* Checks object type and return it.
+*
+* @param {any} obj Object of any type.
+* @return {string} typeRes Result string with type of passed object.
 */
 Purr.util.getType = function (obj) {
 
@@ -710,6 +681,46 @@ Purr.util.getType = function (obj) {
 	});
 
 	return typeRes;
+};
+
+/*
+* Checks if object type is array.
+*
+* @param {any} obj Object of any type.
+* @return {boolean} boolean Returns true if object is array, and false if it isn't.
+*/
+Purr.util.isArray = function (obj) {
+
+	var self = this,
+	typeRes;
+
+	typeRes = this.getType(obj);
+
+	if (typeRes === 'Array') {
+		return true;
+	}
+
+	return false;
+};
+
+/*
+* Checks if object type is string.
+*
+* @param {any} obj Object of any type.
+* @return {boolean} boolean Returns true if object is string, and false if it isn't.
+*/
+Purr.util.isString = function (obj) {
+
+	var self = this,
+	typeRes;
+
+	typeRes = this.getType(obj);
+	
+	if (typeRes === 'String') {
+		return true;
+	}
+
+	return false;
 };
 
 Purr.util.cast = function (item, type) {
