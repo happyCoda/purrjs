@@ -477,6 +477,7 @@ Purr.list.prototype.clone = function () {
 };
 
 Purr.list.prototype.extend = function () {};
+Purr.list.prototype.next = function () {};
 
 
 Purr.string = function (str) {
@@ -496,11 +497,28 @@ Purr.string.create = function (str) {
 	return purrString;
 };
 
-Purr.string.format = function (str, vars) {};
+Purr.string.format = function () {
+	var slice = Array.prototype.slice,
+	args = slice.call(arguments),
+	string = args[0],
+	values = args.slice(1),
+	i = 0,
+	formatedString;
+
+
+
+
+	formatedString = string.replace(/%s|%d/gi, function (m) {
+
+		return m.replace(m, values[i++]);
+	});
+	console.log(formatedString);
+};
 
 Purr.string.prototype.trim = function () {};
 Purr.string.prototype.trimLeft = function () {};
 Purr.string.prototype.trimRight = function () {};
+
 
 
 

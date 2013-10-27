@@ -22,3 +22,9 @@ a1 = Purr.list(a1);
 //a1.removeFirst();
 a1.remove('Zurich', 'Monaco');
 console.log(Purr.util.isArray(a1.getRawArray()));
+
+var stringWithWildcards = 'Hello, mr. %s! You are %d now!',
+name = 'Smith',
+age = 30;
+Purr.string.format(stringWithWildcards, name, age);
+
