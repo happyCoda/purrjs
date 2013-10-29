@@ -28,3 +28,9 @@ name = 'Smith',
 age = 30;
 Purr.string.format(stringWithWildcards, name, age);
 
+function delayed(name, greet) {
+	console.log(greet + ' ' + name + '!');
+}
+
+setTimeout(delayed, 1000, 'World', 'Hello');
+

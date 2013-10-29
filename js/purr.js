@@ -763,6 +763,10 @@ Purr.util.cast = function (item, type) {
 	return casted;
 };
 
+Purr.util.setTimeout = function (fn, delay) {
+	// TODO: pass arguments to callback fn
+};
+
 
 /*
 * @param
