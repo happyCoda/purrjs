@@ -1,9 +1,11 @@
 /*
-* PurrJS JavaScript library. 
-* (c) 2013, happyCoda. 
-* MIT License. 
+* PurrJS JavaScript library.
+* (c) 2013-2016, happyCoda.
+* ISC License.
 * https://github.com/happyCoda/purrjs
 */
+
+'use strict';
 
 var Purr = Purr || {};
 

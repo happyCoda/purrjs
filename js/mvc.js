@@ -1,9 +1,11 @@
 /*
-* PurrJS JavaScript library. 
-* (c) 2013, happyCoda. 
-* MIT License. 
+* PurrJS JavaScript library.
+* (c) 2013, happyCoda.
+* MIT License.
 * https://github.com/happyCoda/purrjs
 */
+
+'use strict';
 
 var Purr = Purr || {};
 
@@ -15,7 +17,7 @@ Purr.MVC.eventHub = function () {
 	}
 
 	this.subscribers = {};
-	
+
 };
 
 Purr.MVC.eventHub.prototype.subscribe = function (event, subscriber) {
@@ -68,7 +70,9 @@ Purr.MVC.model = function (defaults) {
 	this.defaults = this.data = defaults || {};
 };
 
-Purr.MVC.model.prototype.init = function () {};
+Purr.MVC.model.prototype.init = function () {
+
+};
 Purr.MVC.model.prototype.listen = function (msg) {};
 
 Purr.MVC.model.prototype.update = function () {
@@ -128,5 +132,5 @@ Purr.MVC.tpl = {
 		});
 
 		return filledString;
-	} 
+	}
 };

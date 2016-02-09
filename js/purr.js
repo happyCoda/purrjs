@@ -1,9 +1,11 @@
 /*
-* PurrJS JavaScript library. 
-* (c) 2013, happyCoda. 
-* MIT License. 
+* PurrJS JavaScript library.
+* (c) 2013, happyCoda.
+* MIT License.
 * https://github.com/happyCoda/purrjs
 */
+
+'use strict';
 
 var Purr = Purr || {};
 
@@ -41,7 +43,7 @@ Purr.namespace = function (nsstring) {
 		if (!parent[names[len]]) {
 			parent[names[len]] = {};
 		}
-		
+
 		parent = parent[names[len]];
 	}
 
@@ -62,34 +64,34 @@ Purr.util.expose = function (item, name) {
 
 
 /*
-* 
+*
 */
-Purr.util.cleanScope = function () {
-	var exps,
-	item;
-
-	if (window.exposed) {
-		exps = window.exposed;
-		for (item in exps) {
-			item = exps[item];
-			if (Purr.forInCheck(exps, item, 'object')) {
-				if (typeof item === 'object') {
-					for (item[subItem] in exps[item]) {
-						//TODO: check on hasOwnProp
-						item[subItem] = null;
-					}
-				}
-				
-			}
-
-			exps[item] = null;
-		}
-
-		exps = null;
-
-		delete exps;
-	}
-};
+// Purr.util.cleanScope = function () {
+// 	var exps,
+// 	item;
+//
+// 	if (window.exposed) {
+// 		exps = window.exposed;
+// 		for (item in exps) {
+// 			item = exps[item];
+// 			if (Purr.forInCheck(exps, item, 'object')) {
+// 				if (typeof item === 'object') {
+// 					for (item[subItem] in exps[item]) {
+// 						//TODO: check on hasOwnProp
+// 						item[subItem] = null;
+// 					}
+// 				}
+//
+// 			}
+//
+// 			exps[item] = null;
+// 		}
+//
+// 		exps = null;
+//
+// 		delete exps;
+// 	}
+// };
 
 // TODO: make an self invoking function here to create closure and contain reference to this in it
 Purr.list = function (arr) {
@@ -139,7 +141,7 @@ Purr.list.prototype.map = function (fn) {
 Purr.list.prototype.reduce = function (fn) {
 	var self = this,
 	len,
-	res = []; 
+	res = [];
 
 	self.reverse();
 
@@ -205,7 +207,7 @@ Purr.list.prototype.forEach = function (fn) {
 	} else {
 		self.rawArray.forEach(fn);
 	}
-	
+
 
 	return self;
 };
@@ -258,7 +260,7 @@ Purr.list.prototype.addFirst = function () {
 	}
 
 	return self;
-}
+};
 
 /*
 * Removes given item from array.
@@ -362,7 +364,7 @@ Purr.list.prototype.intersect = function (list) {
 				if (intersectList.index(self.get(selfArrayLen)) === -1) {
 					intersectList.add(self.get(selfArrayLen));
 				}
-				
+
 			}
 		}
 	}
@@ -382,7 +384,7 @@ Purr.list.prototype.diff = function (list) {
 				if (diffList.index(self.get(selfArrayLen)) === -1) {
 					diffList.add(self.get(selfArrayLen));
 				}
-				
+
 			}
 		}
 	}
@@ -470,7 +472,7 @@ Purr.list.prototype.clone = function () {
 		} else {
 			// clonedList.add(self.clone(Purr.list.create(self.get(len))).rawArray);
 		}
-		
+
 	}
 
 	return clonedList;
@@ -482,7 +484,7 @@ Purr.list.prototype.next = function () {};
 
 Purr.string = function (str) {
 	if (!(this instanceof Purr.string)) {
-		return new Purr.string(str); 
+		return new Purr.string(str);
 	}
 
 	this.rawString = str || '';
@@ -597,7 +599,7 @@ Purr.array.has = function (arr, needle) {
 * @return {array} res Result array combined of the given arguments.
 */
 Purr.array.create = function () {
-	var prop, 
+	var prop,
 	i = arguments.length - 1,
 	firstArg = arguments[0],
 	res = [];
@@ -625,26 +627,27 @@ Purr.array.create = function () {
 *
 */
 // TODO: finish this method
-Purr.varDump = function () {
-	var vArr = {};
-	for (item in Lib) {
-		if (typeof Lib[item] !== 'function') {
-			vArr[item] = Lib[item];
-		}
-	}
-};
+// Purr.varDump = function () {
+// 	var vArr = {},
+// 		item;
+// 	for (item in Lib) {
+// 		if (typeof Lib[item] !== 'function') {
+// 			vArr[item] = Lib[item];
+// 		}
+// 	}
+// };
 
 
 /*
 * @param
 */
-Purr.findProp = function (propName) {
-	if (Lib[propName]) {
-		return true;
-	}
-
-	return false;
-};
+// Purr.findProp = function (propName) {
+// 	if (Lib[propName]) {
+// 		return true;
+// 	}
+//
+// 	return false;
+// };
 
 
 /*
@@ -733,7 +736,7 @@ Purr.util.isString = function (obj) {
 	typeRes;
 
 	typeRes = this.getType(obj);
-	
+
 	if (typeRes === 'String') {
 		return true;
 	}
@@ -801,8 +804,7 @@ Purr.getClass = function (obj) {
 Purr.object.klass = function (Parent, props) {
 	var Child,
 	prop,
-	F,
-	Parent;
+	F;
 
 	Child = function () {
 		if (Child.uber && Child.uber.hasOwnProperty('_construct')) {
@@ -814,7 +816,7 @@ Purr.object.klass = function (Parent, props) {
 		}
 	};
 
-	
+
 
 	F = function () {};
 	Parent = Parent || {};
@@ -862,7 +864,7 @@ Purr.object.extend = function (recipient, donator) {
 			// 	} else {
 			// 		recipient[prop] = [];
 			// 	}
-				
+
 			// } else {
 			// 	recipient[prop] = {};
 			// }
@@ -895,7 +897,7 @@ Purr.object.mixin = function () {
 	}
 
 	return recipient;
-}
+};
 
 
 /*

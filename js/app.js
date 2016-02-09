@@ -1,5 +1,10 @@
+'use strict';
 var stringWithWildcards = 'Hello, mr. %s! You are %d now!',
-name = 'Smith',
-age = 30;
-Purr.string.format(stringWithWildcards, name, age);
-
+nameToFormat = 'Smith',
+age = 30,
+Purr = Purr || {
+  string: {
+    format: function () {}
+  }
+};
+Purr.string.format(stringWithWildcards, nameToFormat, age);
