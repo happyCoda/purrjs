@@ -6,15 +6,15 @@ describe('Testing Utils.js', function () {
     expect(typeof Utils).toEqual('object');
   });
 
-  it('should implement a getType method', function () {
-
-    expect(typeof Utils.getType).toEqual('function');
-
-  });
-
   it('should define correct type of the passed argument', function () {
 
     expect(Utils.getType([])).toEqual('Array');
+    expect(Utils.getType({})).toEqual('Object');
+    expect(Utils.getType(function () {})).toEqual('Function');
+    expect(Utils.getType(null)).toEqual('Null');
+    expect(Utils.getType(2)).toEqual('Number');
+    expect(Utils.getType(new Date())).toEqual('Date');
+    expect(Utils.getType(new Error())).toEqual('Error');
 
   });
 
@@ -81,6 +81,23 @@ describe('Testing Utils.js', function () {
     expect(Utils.extend(simpleObj, largeObj).klass).toEqual('barbarian');
   });
 
+  it('should implement an extendDeep method', function () {
+    var original = {
+        name: 'Darth',
+        inventory: {
+          armour: 'helmet',
+          weapon: 'lightsabre'
+        }
+      },
+      copy = {};
+
+      Utils.extendDeep(copy, original);
+
+      copy.inventory.clothes = 'black cloak';
+
+    expect(original.inventory.clothes).toBe(undefined);
+  });
+
   it('should implement a mixin method', function () {
     var simpleObj = {
         name: 'Conan'
@@ -99,5 +116,18 @@ describe('Testing Utils.js', function () {
       };
 
     expect(Utils.mixin(simpleObj, largeObj, superObj).weapon).toEqual('two-handed sword');
+  });
+
+  it('should implement an inspect method', function () {
+    var darth = {
+      name: 'Vader',
+      usePower: function () {},
+      enemies: ['Skywalker', {name: 'Kenobi'}, 'Yoda'],
+      misc: {
+        side: 'dark'
+      }
+    };
+
+    expect(Utils.inspect(darth)).toEqual('{"name": "Vader", "usePower": "function () {}", "enemies": ["Skywalker", {"name": "Kenobi"}, "Yoda"], "misc": {"side": "dark"}}');
   });
 });

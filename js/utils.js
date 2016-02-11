@@ -18,7 +18,7 @@ var Utils = {
 
     } else if (iterableType === 'Object') {
       Object.keys(iterable).forEach(function (key) {
-        callback(iterable[key], key, context);
+        callback.call(context, iterable[key], key);
       });
     } else {
       throw new Error('Argument must be an Object or an Array');
@@ -46,7 +46,7 @@ var Utils = {
   },
 
   slice: function (arrayLike) {
-    
+
     return Array.prototype.slice.call(arrayLike);
   },
 
@@ -58,14 +58,88 @@ var Utils = {
     return extendable;
   },
 
+  extendDeep: function (extendable, extension) {
+
+    this.each(extension, function (val, prop) {
+
+      var propType = this.getType(val);
+
+      if (propType === 'Array') {
+
+        extendable[prop] = [];
+
+        this.extendDeep(extendable[prop], val);
+
+      } else if (propType === 'Object') {
+
+        extendable[prop] = {};
+
+        this.extendDeep(extendable[prop], val);
+      } else {
+
+        extendable[prop] = val;
+
+      }
+    }, this);
+  },
+
   mixin: function (extendable) {
-    var mixins = Array.prototype.slice.call(arguments);
+    var mixins = this.slice(arguments);
 
     this.each(mixins, function (mixin) {
       this.extend(extendable, mixin);
     }, this);
 
     return extendable;
+  },
+
+  inspect: function (obj, deeper) {
+    var stringified,
+      objType = this.getType(obj);
+
+      if (objType === 'Object') {
+        stringified = '{';
+      } else if (objType === 'Array') {
+        stringified = '[';
+      } else {
+        return obj.toString();
+      }
+
+    function callback(objType, val, prop) {
+      var propType = this.getType(val);
+
+      if (objType === 'Array') {
+
+        if (propType === 'Object' || propType === 'Array') {
+          stringified += this.inspect(val, true);
+        } else {
+          stringified += '"' + val + '", ';
+        }
+      } else {
+        if (propType === 'Object') {
+          stringified += '"' + prop + '": ';
+          stringified += this.inspect(val, true);
+        } else if (propType === 'Array') {
+          stringified += '"' + prop + '": ';
+          stringified += this.inspect(val, true);
+        } else {
+          stringified += '"' + prop + '": "' + val + '", ';
+        }
+      }
+
+    }
+
+    this.each(obj, callback.bind(this, objType), this);
+
+    stringified = stringified.replace(/(,\s)$/, '');
+
+    stringified += stringified.substr(0, 1) === '{' ? '}' : ']';
+
+    if (deeper) {
+      stringified += ', ';
+    }
+
+    return stringified;
   }
 };
 

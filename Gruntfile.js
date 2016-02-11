@@ -11,6 +11,7 @@ module.exports = function (grunt) {
         browser: true,
         devel: true,
         jasmine: true,
+        validthis: true,
         globals: {
           'window': true,
           'define': true,

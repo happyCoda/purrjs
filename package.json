@@ -1,6 +1,6 @@
 {
   "name": "purrjs",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Pure JavaScript library",
   "main": "purr.js",
   "scripts": {
