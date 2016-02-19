@@ -18,12 +18,6 @@ describe('Testing Utils.js', function () {
 
   });
 
-  it('should implement an each method', function () {
-
-    expect(typeof Utils.each).toEqual('function');
-
-  });
-
   it('should iterate through an object', function () {
     var barInFoo = false;
 
@@ -43,27 +37,43 @@ describe('Testing Utils.js', function () {
 
   });
 
-  it('should implement an unique method', function () {
-
-    expect(typeof Utils.unique).toEqual('function');
-
-  });
-
   it('should transform arrays with duplicates into arrays with unique elements', function () {
 
     expect(Utils.unique([1, 2, 3, 2])).toEqual([1, 2, 3]);
 
   });
 
-  it('should implement an multitype slice method', function () {
+  it('should implement a count method', function () {
 
-    expect(typeof Utils.slice).toEqual('function');
+    expect(Utils.count([2, 4, 6, 2, 5, 2], 2)).toEqual(3);
 
+  });
+
+  it('should implement an intersect method', function () {
+
+    expect(Utils.intersect([2, 3, 4, 5, 6], [7, 9, 6, 3, 1])).toEqual([3, 6]);
+
+  });
+
+  it('should implement a diff method', function () {
+
+    var setA = ['cat', 'dog', 'fish'],
+      setB = ['cheese', 'tomato', 'fish'],
+      expected = ['cat', 'dog'];
+
+    expect(Utils.diff(setA, setB)).toEqual(expected);
+
+  });
+
+  it('should implement an contains method', function () {
+    var tools = ['Babel', 'Grunt.js', 'Jasmine'];
+
+    expect(Utils.contains(tools, 'Gulp.js')).toBeFalsy();
   });
 
   it('should transform an argument into an array', function () {
     var arrayLike = {'0': 'foo', '1': 'bar'},
-      transformed = Utils.slice(arrayLike);
+      transformed = Utils.callToSlice(arrayLike);
 
     expect(Utils.getType(transformed)).toEqual('Array');
 
@@ -126,8 +136,13 @@ describe('Testing Utils.js', function () {
       misc: {
         side: 'dark'
       }
-    };
+    },
+    expected = '{"name": "Vader", "usePower": "function () {}", ';
 
-    expect(Utils.inspect(darth)).toEqual('{"name": "Vader", "usePower": "function () {}", "enemies": ["Skywalker", {"name": "Kenobi"}, "Yoda"], "misc": {"side": "dark"}}');
+    expected += '"enemies": ["Skywalker", {"name": "Kenobi"}, "Yoda"], ';
+
+    expected += '"misc": {"side": "dark"}}';
+
+    expect(Utils.inspect(darth)).toEqual(expected);
   });
 });

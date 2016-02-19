@@ -5,7 +5,7 @@
 Library can be installed via downloading a git repo:
 
 ```shell
-git clone https://github.com/happyCoda/chronos.git
+git clone https://github.com/happyCoda/purrjs.git
 ```
 
 ## Release History
