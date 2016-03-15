@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function (grunt) {
   var time = require('time-grunt');
 
@@ -6,31 +8,16 @@ module.exports = function (grunt) {
 
     jshint: {
       options: {
-        strict: 'global',
-        undef: false,
-        browser: true,
-        devel: true,
-        jasmine: true,
-        validthis: true,
-        globals: {
-          'window': true,
-          'define': true,
-          'require': true,
-          'Purr': true,
-          'Utils': true,
-          'Ui': true,
-          'MVC': true,
-          'module': true
-        },
-        sub: true,
+        jshintrc: '.jshintrc',
         ignores: [
           'bower_components/**/*',
           'node_modules/**/*',
           '.grunt/**/*',
           '**/require.js',
           '**/jquery*.js',
-          'Gruntfile.js',
-          'utilsSpec.js'
+          '**/react*.js',
+          '**/bundle.js',
+          '**/bundleSpec.js'
         ]
       },
 
@@ -41,12 +28,11 @@ module.exports = function (grunt) {
 
     jasmine: {
       options: {
-        specs: 'test/specs/*Spec.js'
+        specs: 'test/specs/dest/*Spec.js',
+        outfile: 'test/_SpecRunner.html'
       },
 
-      dev: {
-        src: 'js/utils.js'
-      }
+      dev: {}
     },
 
     uglify: {
@@ -55,11 +41,62 @@ module.exports = function (grunt) {
       build: {}
     },
 
-    express: {
+    browserify: {
+      options: {},
+
+      dev: {
+        files: {
+          'js/dest/bundle.js': ['js/*.js']
+        }
+      },
+
+      test: {
+        files: {
+          'test/specs/dest/bundleSpec.js': ['test/specs/*Spec.js']
+        }
+      }
+    },
+
+    clean: {
+      css: {
+        src: ['css/*.css']
+      }
+    },
+
+    less: {
+      options: {
+        compress: true
+      },
+
+      dev: {
+        src: ['css/*.less'],
+        dest: 'css/style.css'
+      }
+    },
+
+    babel: {
+      options: {
+        plugins: ['transform-react-jsx'],
+        presets: ['react']
+      },
+
+      dev: {
+        files: [{
+          expand: true,
+          flatten: true,
+          cwd: '.',
+          src: ['jsx/*.jsx'],
+          dest: 'js/',
+          ext: '.js'
+        }]
+      }
+    },
+
+    connect: {
       options: {
         hostname: 'localhost',
         port: 1337,
-        bases: ['./']
+        base: './'
       },
 
       dev: {}
@@ -77,30 +114,31 @@ module.exports = function (grunt) {
           '!node_modules/**',
           '!.grunt/**',
           '!**/_SpecRunner.html',
+          '!**/bundle.js',
+          '!**/bundleSpec.js',
           '!**/require.js',
           '!**/jquery*.js',
+          '!**/*css',
+          '!**/header.js',
+          '!**/main.js',
+          '!**/menu.js',
+          '!**/section.js'
         ],
-        tasks: ['jshint:dev', 'jasmine:dev']
+        tasks: ['babel:dev', 'jshint:dev', 'browserify:test', 'jasmine:dev', 'clean:css', 'less:dev']
       }
-    },
-
-    concurrent: {
-      options: {
-        logConcurrentOutput: true
-      },
-      workflow: ['express:dev', 'watch:dev'],
-      server: ['express:dev'],
-      watcher: ['watch:dev']
     }
   });
 
   time(grunt);
 
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
-  grunt.loadNpmTasks('grunt-express');
-  grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-browserify');
 
-  grunt.registerTask('observe', ['express:dev', 'watch:dev']);
+  grunt.registerTask('observe', ['connect:dev', 'watch:dev']);
 };

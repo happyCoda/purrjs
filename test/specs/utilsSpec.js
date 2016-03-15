@@ -1,6 +1,9 @@
 'use strict';
 
-describe('Testing Utils.js', function () {
+var Utils = require('../../js/utils');
+
+describe('utils.js suite', function () {
+
   it('should be an object', function () {
 
     expect(typeof Utils).toEqual('object');

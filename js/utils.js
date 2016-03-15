@@ -8,6 +8,7 @@
 'use strict';
 
 var Utils = (function () {
+
   return {
     name: 'Utils',
 
@@ -100,12 +101,13 @@ var Utils = (function () {
     },
 
     diff: function (setA, setB) {
+
     	var lenSetA = setA.length,
-    	lenSetB = setB.length,
-      i = 0,
-      j,
-      current,
-    	difference = [];
+      	lenSetB = setB.length,
+        i = 0,
+        j,
+        current,
+      	difference = [];
 
       for (; i < lenSetA; i += 1) {
         current = setA[i];
@@ -118,6 +120,7 @@ var Utils = (function () {
     },
 
     contains: function (box, item) {
+
       var boxType = this.getType(box),
         itemType,
         result = false;
@@ -139,6 +142,7 @@ var Utils = (function () {
     },
 
     extend: function (extendable, extension) {
+
       this.each(extension, function (val, prop) {
         extendable[prop] = val;
       });
@@ -172,6 +176,7 @@ var Utils = (function () {
     },
 
     mixin: function (extendable) {
+
       var mixins = this.callToSlice(arguments);
 
       this.each(mixins, function (mixin) {
@@ -182,6 +187,7 @@ var Utils = (function () {
     },
 
     inspect: function (obj, deeper) {
+
       var stringified,
         objType = this.getType(obj);
 

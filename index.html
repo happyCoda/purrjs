@@ -4,25 +4,37 @@
 	<meta charset="utf-8">
 	<title>PurrJS</title>
 	<link rel="stylesheet" href="css/style.css">
-	<script src="js/jquery-2.0.3.min.js"></script>
-	<script src="js/purr.js"></script>
-	<script src="js/mvc.js"></script>
-	<script src="js/app.js"></script>
 </head>
 <body>
-	<div class="container">
-		<header class="main_header">
-			<h1>PurrJS library :{</h1>
-		</header>
-		<section class="main_content">
-			<code class="code">
-				Purr.method();
-			</code>
-		</section>
-		<footer class="main_footer">
-			<p class="copy">&copy; 2013 happyCoda</p>
-		</footer>
+	<div class="wrapper">
+		<div class="header-wrapper">
+			<header class="main_header">
+				<h1 class="main_header__heading">PurrJS library :{</h1>
+				<nav class="main_header__menu">
+					<ul class="main_header__menu__list">
+						<li class="main_header__menu__i"><a href="#installation" class="_link">Installation</a></li>
+						<li class="main_header__menu__i"><a href="#options" class="_link">Options</a></li>
+						<li class="main_header__menu__i"><a href="#usage" class="_link">Usage</a></li>
+						<li class="main_header__menu__i"><a href="#utils" class="_link">Utils</a></li>
+						<li class="main_header__menu__i"><a href="#mvc" class="_link">MVC</a></li>
+						<li class="main_header__menu__i"><a href="#ui" class="_link">UI</a></li>
+						<li class="main_header__menu__i"><a href="#other-stuff" class="_link">Other stuff</a></li>
+					</ul>
+				</nav>
+			</header>
+		</div>
+		<div class="container">
+			<section class="main_content">
+				<code class="code">
+					Purr.method();
+				</code>
+			</section>
+		</div>
 	</div>
+	<footer class="main_footer">
+		<p class="copy">&copy; 2016 happyCoda</p>
+	</footer>
+	<script data-main="js/main" src="js/require.js"></script>
 	<script src="//localhost:35729/livereload.js"></script>
 </body>
 </html>
