@@ -1,38 +1,81 @@
 'use strict';
 
-var Klass = (function () {
-  var _klass = function (obj) {
-    var F = function () {
-      if (this.implements) {
+var Interface = require('./interface'),
+  Klass;
 
-        _klass.ensureImplemented(this, this.implements);
+Klass = (function () {
+  var _klass = function (obj) {
+    var F;
+
+    F = function () {
+      var interfaces = obj.implements,
+        extensions = obj.extends;
+
+      if (extensions) {
+        _klass.extend(this, extensions);
+      }
+
+      if (interfaces) {
+
+        interfaces.forEach(function (intr, idx) {
+
+          intr.ensureImplemented(this);
+
+        }, this);
       }
     };
 
-    Object.keys(obj).forEach(function (key) {
 
-      F.prototype[key] = obj[key];
+
+    Object.keys(obj).forEach(function (key) {
+      if (key !== 'implements') {
+        F.prototype[key] = obj[key];
+      }
     });
 
     return F;
   };
 
-  _klass.ensureImplemented = function () {
-    var obj = arguments[0],
-      interfaces = Array.prototype.slice.call(arguments, 1),
-      notImplemented = [];
+  // _klass.ensureImplemented = function (obj, interfaces) {
+  //   var notImplemented = [];
+  //
+  //   interfaces.forEach(function (intr) {
+  //     intr.members.forEach(function (member) {
+  //       if (!obj[member]) {
+  //         notImplemented.push(member);
+  //       }
+  //     });
+  //   });
+  //
+  //
+  //   if (notImplemented.length > 0) {
+  //
+  //     throw new Error(notImplemented.join(', ') + ' must be implemented!');
+  //
+  //   }
+  // };
 
-    interfaces.forEach(function (intr) {
-      Object.keys(intr).forEach(function (key) {
-        if (!obj[key]) {
-          notImplemented.push(key);
-        }
+  _klass.extend = function (obj, extensions) {
+
+    extensions.forEach(function (extension) {
+        var objProto = obj.constructor.prototype,
+          extensionProto = extension.prototype;
+
+          Object.keys(extensionProto).forEach(function (key) {
+
+            if (!objProto[key]) {
+              objProto[key] = extensionProto[key];
+            } else {
+                if (typeof objProto[key] === 'function') {
+                  objProto[key] = objProto[key].bind(obj, extensionProto[key]);
+                }
+            }
+
+          });
+
+          extension.call(obj);
       });
-    });
 
-    if (notImplemented.length > 0) {
-      throw new Error(notImplemented.join(', ') + ' must be implemented!');
-    }
   };
 
   return _klass;

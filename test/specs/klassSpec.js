@@ -5,7 +5,8 @@ describe('klass.js suite', function () {
   var Interface = require('../../js/interface'),
     Klass = require('../../js/klass'),
     personInterface,
-    Person;
+    Person,
+    john;
 
   beforeEach(function () {
     personInterface = new Interface(['getName', 'setName']);
@@ -19,8 +20,6 @@ describe('klass.js suite', function () {
 
   it('should create new constructors', function () {
 
-    var john;
-
     john = new Person();
 
     expect(typeof Klass).toEqual('function');
@@ -30,12 +29,46 @@ describe('klass.js suite', function () {
 
   it('should know how to use interfaces', function () {
 
-    var john;
-
-    spyOn(Klass, 'ensureImplemented').and.callThrough();
+    spyOn(personInterface, 'ensureImplemented');
 
     john = new Person();
 
-    expect(Klass.ensureImplemented).toHaveBeenCalled();
+    expect(personInterface.ensureImplemented).toHaveBeenCalled();
+    expect(personInterface.ensureImplemented).not.toThrow();
+  });
+
+  it('should implement multiple interfaces', function () {
+
+    var betterPersonInterface = new Interface(['getAge', 'sayHello']),
+      BetterPerson = Klass({
+        implements: [personInterface, betterPersonInterface],
+        getName: function () {},
+        setName: function () {},
+        sayHello: function () {}
+      }),
+      jamesBond;
+
+    spyOn(personInterface, 'ensureImplemented');
+
+    jamesBond = spyOn(betterPersonInterface, 'ensureImplemented').and.callFake(function () {});
+
+    john = new BetterPerson();
+
+    expect(personInterface.ensureImplemented).toHaveBeenCalled();
+    expect(betterPersonInterface.ensureImplemented).toHaveBeenCalled();
+    expect(function () {
+      jamesBond.and.callThrough();
+      betterPersonInterface.ensureImplemented(john);
+    }).toThrow();
+  });
+
+  it('should extend other klasses', function () {
+    var Hero = Klass({
+      extends: [Person],
+      fly: function () {}
+    }),
+    superman = new Hero();
+
+    expect(superman.getName).toBeDefined();
   });
 });
