@@ -12,7 +12,7 @@ describe('interface.js suite', function () {
   it('should check for implementation', function () {
 
     expect(function () {
-      PersonInterface.isImplemented({
+      PersonInterface.ensureImplemented({
         getName: function () {},
 
         setName: function () {}
@@ -20,7 +20,7 @@ describe('interface.js suite', function () {
     }).not.toThrow();
 
     expect(function () {
-      PersonInterface.isImplemented({
+      PersonInterface.ensureImplemented({
 
         setName: function () {}
       });

@@ -141,6 +141,13 @@ var Utils = (function () {
       return Array.prototype.slice.call(arrayLike);
     },
 
+    /*
+    * Extends one object by another.
+    *
+    * @param {Object} extendable Object which will be extended.
+    * @param {Object} extension Object by which will be do extension.
+    * @return {Object} extendable Extended object.
+    */
     extend: function (extendable, extension) {
 
       this.each(extension, function (val, prop) {
@@ -175,11 +182,18 @@ var Utils = (function () {
       }, this);
     },
 
-    mixin: function (extendable) {
+    /*
+    * Extends object by the given functionality. Multiple inheritance.
+    *
+    * @param {Object} any Any number of arguments with object type.
+    * @return {Object} extendable Object extended with mixins.
+    */
+    mixin: function () {
 
-      var mixins = this.callToSlice(arguments);
+      var args = this.callToSlice(arguments),
+        extendable = args.shift();
 
-      this.each(mixins, function (mixin) {
+      this.each(args, function (mixin) {
         this.extend(extendable, mixin);
       }, this);
 
@@ -240,13 +254,50 @@ var Utils = (function () {
     * Makes any object available in global scope
     *
     * @param {Object} global Any global object to include exposable
-    * @param {any} item Entity for expose
-    * @param {string} name The name of the exposed entity
+    * @param {Any} item Entity for expose
+    * @param {String} name The name of the exposed entity
     */
     expose: function (global, item, name) {
     	global.exposed = global.exposed || {};
 
     	global.exposed[name] = item;
+    },
+
+    /*
+    * @param {Number} min Minimum number boundary.
+    * @param {Number} max Maximum number boundary.
+    * @return {Number} randNum Random number generated.
+    */
+    randomNum: function (min, max) {
+
+    	var randNum = Math.random() * max;
+
+    	randNum = Math.round(randNum);
+
+    	if (randNum <= max && randNum >= min) {
+
+    		return randNum;
+
+    	}
+
+    	return this.randomNum(min, max);
+    },
+
+    /*
+    * @param {String} nsstring String representation of the desired namespace.
+    * @return {Object} this Returning created namespace object.
+    */
+    namespace: function (nsstring) {
+    	var names = nsstring.split('.'),
+    	 parent = {},
+       current = parent;
+
+      names.forEach(function (name) {
+        current[name] = {};
+        current = current[name];
+      });
+
+    	return parent;
     }
   };
 })();

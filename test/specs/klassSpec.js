@@ -71,4 +71,25 @@ describe('klass.js suite', function () {
 
     expect(superman.getName).toBeDefined();
   });
+
+  it('should be able to call superklass methods', function () {
+    var Hero, superman;
+
+    spyOn(Person.prototype, 'getName').and.callThrough();
+
+    Hero = Klass({
+      extends: [Person],
+      fly: function () {},
+      getName: function (_super) {
+
+        _super();
+      }
+    });
+
+    superman = new Hero();
+
+    superman.getName();
+
+    expect(Person.prototype.getName).toHaveBeenCalled();
+  });
 });

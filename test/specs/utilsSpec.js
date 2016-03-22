@@ -148,4 +148,20 @@ describe('utils.js suite', function () {
 
     expect(Utils.inspect(darth)).toEqual(expected);
   });
+
+  it('should implement random number generation', function () {
+
+    var inBetween = Utils.randomNum(10, 49);
+
+    expect(inBetween).not.toBeLessThan(10);
+    expect(inBetween).not.toBeGreaterThan(49);
+  });
+
+  it('should create namespaces', function () {
+
+    var ns = Utils.namespace('foo.bar.baz');
+
+    expect(typeof ns).toEqual('object');
+    expect(typeof ns.foo.bar.baz).toEqual('object');
+  });
 });

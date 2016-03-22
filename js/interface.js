@@ -5,9 +5,10 @@ var Interface = (function () {
     this.members = members;
   }
 
-  _interface.prototype.isImplemented = function (obj) {
+  _interface.prototype.ensureImplemented = function (obj) {
 
     this.members.forEach(function (key) {
+      
       if (typeof obj[key] === 'undefined') {
         throw new Error(key + ' member must be implemented!');
       }

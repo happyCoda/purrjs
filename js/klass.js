@@ -1,19 +1,21 @@
 'use strict';
 
-var Interface = require('./interface'),
+var Utils = require('./utils'),
+  Interface = require('./interface'),
   Klass;
 
 Klass = (function () {
+  /*
+  * @param {Object} obj Params object with klass properties, interfaces and parent classes.
+  * @return {function} F The new klass constructor.
+  */
   var _klass = function (obj) {
-    var F;
+    var F,
+      extensions,
+      _proto;
 
     F = function () {
-      var interfaces = obj.implements,
-        extensions = obj.extends;
-
-      if (extensions) {
-        _klass.extend(this, extensions);
-      }
+      var interfaces = obj.implements;
 
       if (interfaces) {
 
@@ -25,57 +27,44 @@ Klass = (function () {
       }
     };
 
+    extensions = obj.extends;
 
+    _proto = F.prototype;
 
-    Object.keys(obj).forEach(function (key) {
-      if (key !== 'implements') {
-        F.prototype[key] = obj[key];
+    if (extensions) {
+      extensions.forEach(function (extension) {
+          var extensionProto = extension.prototype;
+
+          Utils.extend(_proto, extensionProto);
+      });
+    }
+
+    Utils.each(obj, function (val, key) {
+      var temp;
+
+      if (key !== 'implements' && key !== 'extends') {
+
+        if (typeof _proto[key] === 'function') {
+
+          temp = _proto[key];
+
+          _proto[key] = function () {
+            var args = Array.prototype.slice.call(arguments);
+
+            args.unshift(temp.bind(this));
+
+            val.apply(this, args);
+          };
+
+        } else {
+
+          _proto[key] = val;
+        }
+
       }
-    });
+    }, null);
 
     return F;
-  };
-
-  // _klass.ensureImplemented = function (obj, interfaces) {
-  //   var notImplemented = [];
-  //
-  //   interfaces.forEach(function (intr) {
-  //     intr.members.forEach(function (member) {
-  //       if (!obj[member]) {
-  //         notImplemented.push(member);
-  //       }
-  //     });
-  //   });
-  //
-  //
-  //   if (notImplemented.length > 0) {
-  //
-  //     throw new Error(notImplemented.join(', ') + ' must be implemented!');
-  //
-  //   }
-  // };
-
-  _klass.extend = function (obj, extensions) {
-
-    extensions.forEach(function (extension) {
-        var objProto = obj.constructor.prototype,
-          extensionProto = extension.prototype;
-
-          Object.keys(extensionProto).forEach(function (key) {
-
-            if (!objProto[key]) {
-              objProto[key] = extensionProto[key];
-            } else {
-                if (typeof objProto[key] === 'function') {
-                  objProto[key] = objProto[key].bind(obj, extensionProto[key]);
-                }
-            }
-
-          });
-
-          extension.call(obj);
-      });
-
   };
 
   return _klass;
