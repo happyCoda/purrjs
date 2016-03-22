@@ -300,7 +300,7 @@ var Utils = (function () {
     	return parent;
     }
   };
-})();
+}());
 
 if (typeof define === 'function' && define.amd) {
   define(['purr'], function (Purr) {
