@@ -10,6 +10,8 @@
 var Utils = require('./utils'),
 	Interface = require('./interface'),
 	Klass = require('./klass'),
+	Observer = require('./observer'),
+	Observable = require('./observable'),
 	MVC;
 
 MVC = (function () {
@@ -35,6 +37,51 @@ MVC = (function () {
 
 			return new _model();
 		},
+
+		view: function (params) {
+			var viewInterface = new Interface([]),
+				_view,
+				_params = {
+					implements: [viewInterface],
+					render: function () {}
+				};
+
+				if (params) {
+					Utils.extend(_params, params);
+				}
+
+				_view = Klass(_params);
+
+				return new _view();
+		},
+
+		controller: function (params) {
+			var controllerInterface = new Interface(['add', 'remove', 'notify']),
+				_controller,
+				_params = {
+					implements: [controllerInterface],
+					extends: Observable,
+					initialize: function (params) {
+						Utils.extend(this, params);
+					}
+				};
+
+				_controller = Klass(_params);
+
+				return new _controller(params);
+		},
+
+		// controller.prototype.init: function (params) {
+		// 	var self = this;
+		//
+		// 	self.model = params.model;
+		// 	self.view = params.view;
+		//
+		// 	self.evtHub = eventHub();
+		//
+		// 	self.eventHub.subscribe('modelChange', self.view.listen);
+		// 	self.eventHub.subscribe('viewChange', self.model.listen);
+		// },
 
 		// eventHub: function () {
 		// 	if (!(this instanceof eventHub)) {
@@ -67,46 +114,7 @@ MVC = (function () {
 		// },
 		//
 		//
-		// controller: function () {
-		// 	if (!(this instanceof controller)) {
-		// 		return new controller();
-		// 	}
-		// },
 		//
-		// controller.prototype.init: function (params) {
-		// 	var self = this;
-		//
-		// 	self.model = params.model;
-		// 	self.view = params.view;
-		//
-		// 	self.evtHub = eventHub();
-		//
-		// 	self.eventHub.subscribe('modelChange', self.view.listen);
-		// 	self.eventHub.subscribe('viewChange', self.model.listen);
-		// },
-		//
-		//
-		//
-		// model: function (defaults) {
-		// 	if (!(this instanceof model)) {
-		// 		return new model();
-		// 	}
-		//
-		// 	this.defaults = this.data = defaults || {};
-		// },
-		//
-		// model.prototype.init: function () {},
-		// model.prototype.listen: function (msg) {},
-		// model.prototype.update: function () {},
-		//
-		// view: function () {
-		// 	if (!(this instanceof view)) {
-		// 		return new view();
-		// 	}
-		// },
-		//
-		// view.prototype.init: function () {},
-		// view.prototype.listen: function (msg) {},
 		//
 		// tpl = {
 		//

@@ -18,18 +18,30 @@ var Utils = (function () {
       return toStr.call(something).replace(/\[|\]/g, '').split(' ')[1];
     },
 
-    each: function (iterable, callback, context) {
-      var iterableType = this.getType(iterable);
+    each: function (iterable, callback, context, usePrototype) {
+      var iterableType = this.getType(iterable),
+        prop;
 
       if (iterableType === 'Array') {
 
         iterable.forEach(callback, context);
 
       } else if (iterableType === 'Object') {
-        Object.keys(iterable).forEach(function (key) {
-          callback.call(context, iterable[key], key);
-        });
+
+        if (usePrototype) {
+
+          for (prop in iterable) {
+
+            callback.call(context, iterable[prop], prop);
+          }
+        } else {
+
+          Object.keys(iterable).forEach(function (key) {
+            callback.call(context, iterable[key], key);
+          });
+        }
       } else {
+
         throw new Error('Argument must be an Object or an Array');
       }
     },
@@ -148,11 +160,11 @@ var Utils = (function () {
     * @param {Object} extension Object by which will be do extension.
     * @return {Object} extendable Extended object.
     */
-    extend: function (extendable, extension) {
+    extend: function (extendable, extension, usePrototype) {
 
       this.each(extension, function (val, prop) {
         extendable[prop] = val;
-      });
+      }, null, usePrototype);
 
       return extendable;
     },

@@ -40,6 +40,24 @@ describe('utils.js suite', function () {
 
   });
 
+  it('should be able to work with prototype chain', function () {
+    var doStuff = false,
+      TestCase = function () {
+        this.buzz = 'word';
+      };
+
+    TestCase.prototype.doStuff = function () {};
+
+    Utils.each(new TestCase(), function (item, key) {
+      if (key === 'doStuff') {
+        doStuff = true;
+      }
+    }, null, true);
+
+    expect(doStuff).toBeTruthy();
+
+  });
+
   it('should transform arrays with duplicates into arrays with unique elements', function () {
 
     expect(Utils.unique([1, 2, 3, 2])).toEqual([1, 2, 3]);

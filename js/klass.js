@@ -15,7 +15,13 @@ Klass = (function () {
       _proto;
 
     F = function () {
-      var interfaces = obj.implements;
+      var args = Utils.callToSlice(arguments),
+        initialize = obj.initialize,
+        interfaces = obj.implements;
+
+      if (initialize) {
+        initialize.apply(this, args);
+      }
 
       if (interfaces) {
 

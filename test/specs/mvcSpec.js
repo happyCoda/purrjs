@@ -31,4 +31,42 @@ describe('mvc.js suite', function () {
 
     expect(user.add.calls.mostRecent().returnValue).toEqual(data);
   });
+
+  it('should create views', function () {
+
+    var userView = new MVC.view();
+
+    expect(userView.render).toBeDefined();
+
+  });
+
+  it('should create custom views', function () {
+
+    var userView = new MVC.view({
+        render: function (data) {
+          return data;
+        }
+      }),
+      data = 'some data';
+
+    spyOn(userView, 'render').and.callThrough();
+
+    userView.render(data);
+
+    expect(userView.render.calls.mostRecent().returnValue).toEqual(data);
+  });
+
+  it('should create controllers', function () {
+
+    var user = new MVC.model(),
+      userView = new MVC.view(),
+      userController = new MVC.controller({
+        model: user,
+        view: userView
+      });
+
+    expect(userController.model).toEqual(user);
+    expect(userController.view).toEqual(userView);
+
+  });
 });

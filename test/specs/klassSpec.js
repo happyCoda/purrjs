@@ -27,6 +27,19 @@ describe('klass.js suite', function () {
     expect(john.getName).toBeDefined();
   });
 
+  it('should use initialize method', function () {
+
+    var initSpy = jasmine.createSpy('initSpy'),
+      PersonWithInit = Klass({
+        initialize: initSpy
+      });
+
+    john = new PersonWithInit('John');
+
+    expect(initSpy).toHaveBeenCalled();
+    expect(initSpy.calls.mostRecent().args[0]).toEqual('John');
+  });
+
   it('should know how to use interfaces', function () {
 
     spyOn(personInterface, 'ensureImplemented');
