@@ -43,14 +43,18 @@ describe('observable.js suite', function () {
 
     it('should implement notify method', function () {
 
+      var message = 'Attention!';
+
       expect(obs.notify).toBeDefined();
 
       watcher.observe(obs);
 
-      spyOn(watcher, 'recieve').and.callThrough();
+      spyOn(watcher, 'recieve');
 
-      obs.notify('Attention!');
+      obs.notify(message);
 
       expect(watcher.recieve).toHaveBeenCalled();
+
+      expect(watcher.recieve.calls.mostRecent().args[0]).toEqual(message);
     });
 });

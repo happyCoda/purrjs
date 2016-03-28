@@ -56,17 +56,74 @@ describe('mvc.js suite', function () {
     expect(userView.render.calls.mostRecent().returnValue).toEqual(data);
   });
 
-  xit('should create controllers', function () {
+  it('should create controllers', function () {
 
     var user = new MVC.model(),
       userView = new MVC.view(),
-      userController = new MVC.controller({
-        model: user,
-        view: userView
-      });
+      userController = new MVC.controller(),
+      updates = 'some new data';
 
-    expect(userController.model).toEqual(user);
-    expect(userController.view).toEqual(userView);
+    spyOn(user, 'update');
 
+    spyOn(userView, 'render');
+
+    userController.subscribe('change', user, user.update);
+
+    userController.subscribe('update', userView, userView.render);
+
+    userController.publish('change', updates);
+
+    userController.publish('update', updates);
+
+    expect(user.update).toHaveBeenCalled();
+
+    expect(user.update.calls.mostRecent().args[0]).toEqual(updates);
+
+    expect(userView.render).toHaveBeenCalled();
+
+    expect(userView.render.calls.mostRecent().args[0]).toEqual(updates);
+
+  });
+
+  it('should provide communication between all app components', function () {
+    var user = new MVC.model({
+        update: function (data) {
+          this.data = data;
+        },
+        fetch: function (dispatcher) {
+          var data = Math.round(Math.random() * 100) + 'xxx' + Math.round(Math.random() * 33) + 'yyy';
+
+          dispatcher.publish('update', data);
+        }
+      }),
+      userView = new MVC.view({
+        onChange: function (dispatcher, data) {
+          dispatcher.publish('change', data);
+        },
+        render: function (data) {
+          this.data = data;
+        }
+      }),
+      userController = new MVC.controller();
+
+    spyOn(user, 'update');
+
+    spyOn(userView, 'render');
+
+    userController.subscribe('change', user, user.update);
+
+    userController.subscribe('update', userView, userView.render);
+
+    user.fetch(userController);
+
+    userView.onChange(userController, 'some data');
+
+    expect(user.update).toHaveBeenCalled();
+
+    expect(user.update.calls.mostRecent().args[0]).toEqual('some data');
+
+    expect(userView.render).toHaveBeenCalled();
+
+    expect((/\d+[x]{3}\d+[y]{3}/gi).test(userView.render.calls.mostRecent().args[0])).toBeTruthy();
   });
 });

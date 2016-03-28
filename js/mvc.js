@@ -38,7 +38,7 @@ MVC = (function () {
 		},
 
 		view: function (params) {
-			var _viewInterface = new Interface([]),
+			var _viewInterface = new Interface(['render']),
 				_view,
 				_params = {
 					implements: [_viewInterface],
@@ -59,12 +59,21 @@ MVC = (function () {
 				_controller,
 				_params = {
 					implements: [_controllerInterface],
-					extends: [Dispatcher]
+
+					extends: [Dispatcher],
+
+					initialize: function (_super) {
+						_super();
+					}
 				};
+
+				if (params) {
+					Utils.extend(_params, params);
+				}
 
 				_controller = Klass(_params);
 
-				return new _controller(params);
+				return new _controller();
 		},
 
 		// controller.prototype.init: function (params) {

@@ -16,7 +16,7 @@ Klass = (function () {
 
     F = function () {
       var args = Utils.callToSlice(arguments),
-        initialize = obj.initialize,
+        initialize = this.initialize,
         interfaces = obj.implements;
 
       if (initialize) {
