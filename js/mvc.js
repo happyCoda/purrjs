@@ -10,8 +10,7 @@
 var Utils = require('./utils'),
 	Interface = require('./interface'),
 	Klass = require('./klass'),
-	Observer = require('./observer'),
-	Observable = require('./observable'),
+	Dispatcher = require('./dispatcher'),
 	MVC;
 
 MVC = (function () {
@@ -19,10 +18,10 @@ MVC = (function () {
 	return {
 
 		model: function (params) {
-			var modelInterface = new Interface(['add', 'get', 'update', 'remove']),
+			var _modelInterface = new Interface(['add', 'get', 'update', 'remove']),
 				_model,
 				_params = {
-					implements: [modelInterface],
+					implements: [_modelInterface],
 					add: function () {},
 					get: function () {},
 					update: function () {},
@@ -39,10 +38,10 @@ MVC = (function () {
 		},
 
 		view: function (params) {
-			var viewInterface = new Interface([]),
+			var _viewInterface = new Interface([]),
 				_view,
 				_params = {
-					implements: [viewInterface],
+					implements: [_viewInterface],
 					render: function () {}
 				};
 
@@ -56,14 +55,11 @@ MVC = (function () {
 		},
 
 		controller: function (params) {
-			var controllerInterface = new Interface(['add', 'remove', 'notify']),
+			var _controllerInterface = new Interface(['subscribe', 'publish']),
 				_controller,
 				_params = {
-					implements: [controllerInterface],
-					extends: Observable,
-					initialize: function (params) {
-						Utils.extend(this, params);
-					}
+					implements: [_controllerInterface],
+					extends: [Dispatcher]
 				};
 
 				_controller = Klass(_params);

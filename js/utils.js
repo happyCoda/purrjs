@@ -149,8 +149,19 @@ var Utils = (function () {
     },
 
     callToSlice: function (arrayLike) {
+      var slice = Array.prototype.slice,
+        params = slice.call(arguments, 1),
+        arrayNormalized;
 
-      return Array.prototype.slice.call(arrayLike);
+      if (params.length > 0) {
+
+        arrayNormalized = slice.apply(arrayLike, params);
+      } else {
+
+        arrayNormalized = slice.call(arrayLike);
+      }
+
+      return arrayNormalized;
     },
 
     /*

@@ -56,7 +56,7 @@ describe('mvc.js suite', function () {
     expect(userView.render.calls.mostRecent().returnValue).toEqual(data);
   });
 
-  it('should create controllers', function () {
+  xit('should create controllers', function () {
 
     var user = new MVC.model(),
       userView = new MVC.view(),

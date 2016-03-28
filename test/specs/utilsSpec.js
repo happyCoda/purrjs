@@ -93,11 +93,16 @@ describe('utils.js suite', function () {
   });
 
   it('should transform an argument into an array', function () {
-    var arrayLike = {'0': 'foo', '1': 'bar'},
-      transformed = Utils.callToSlice(arrayLike);
+    var transformed,
+      transformedWithShift;
+
+    (function () {
+      transformed = Utils.callToSlice(arguments);
+      transformedWithShift = Utils.callToSlice(arguments, 1);
+    } ('foo', 'bar', 'baz'));
 
     expect(Utils.getType(transformed)).toEqual('Array');
-
+    expect(transformedWithShift.length).toEqual(2);
   });
 
   it('should implement an extend method', function () {

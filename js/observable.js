@@ -15,9 +15,9 @@ var Utils = require('./utils'),
 Observable = (function () {
 
   var _observable,
-		observableInterface = new Interface(['add', 'remove', 'notify']),
+		_observableInterface = new Interface(['add', 'remove', 'notify']),
 		_params = {
-			implements: [observableInterface],
+			implements: [_observableInterface],
 
 			initialize: function () {
 				this.observers = [];

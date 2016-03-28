@@ -15,9 +15,9 @@ var Utils = require('./utils'),
 Observer = (function () {
 
     var _observer,
-      observerInterface = new Interface(['observe', 'unObserve', 'recieve']),
+      _observerInterface = new Interface(['observe', 'unObserve', 'recieve']),
       _params = {
-        implements: [observerInterface],
+        implements: [_observerInterface],
 
         initialize: function (params) {
           if (params) {
