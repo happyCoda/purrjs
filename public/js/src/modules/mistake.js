@@ -8,7 +8,10 @@
 import EventBus from './bus';
 
 function Mistake() {
-  this.bus = new EventBus();
+  if (!(this instanceof Mistake)) {
+    return new Mistake();
+  }
+  this.bus = EventBus();
 }
 
 Mistake.prototype = Object.create(Mistake.prototype, {
@@ -16,6 +19,15 @@ Mistake.prototype = Object.create(Mistake.prototype, {
     value(msg) {
       throw new Error(msg);
     },
+    enumerable: true,
+    writable: false
+  },
+
+  warn: {
+    value(msg) {
+      console.warn(msg);
+    },
+    enumerable: true,
     writable: false
   },
 
@@ -31,6 +43,7 @@ Mistake.prototype = Object.create(Mistake.prototype, {
 
       return this;
     },
+    enumerable: true,
     writable: false
   },
 
@@ -40,36 +53,9 @@ Mistake.prototype = Object.create(Mistake.prototype, {
 
       return this;
     },
+    enumerable: true,
     writable: false
   }
 });
-
-// class Mistake {
-//   constructor() {
-//     this.bus = new EventBus();
-//   }
-//
-//   throw(msg) {
-//     throw new Error(msg);
-//   }
-//
-//   try(fn, ...args) {
-//     try {
-//       fn.apply(null, args);
-//     } catch (err) {
-//       setTimeout(() => {
-//         this.bus.emit('mistake', err);
-//       }, 100);
-//     }
-//
-//     return this;
-//   }
-//
-//   catch(fn) {
-//     this.bus.on('mistake', fn);
-//
-//     return this;
-//   }
-// }
 
 export default Mistake;

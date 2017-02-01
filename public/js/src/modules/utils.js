@@ -1,19 +1,45 @@
 /*
-* UtilsJS JavaScript library.
+* PurrJS JavaScript library.
 * (c) 2016-2017, happyCoda.
 * MIT License.
 * https://github.com/happyCoda/purrjs
 */
 
 import Stream from './stream';
+import EventBus from './bus';
 import Mistake from './mistake';
 import CONFIG from './config';
 
 let Utils = (function () {
 
-  function _makeArray() {
-    let arrayLike = this._stream.flush(),
-      arrayLikeType = this.type();
+  // let _bus = EventBus();
+
+  function _getKind(thing) {
+    let toStr = Object.prototype.toString;
+
+    if (thing === undefined) {
+      Mistake().throw(CONFIG.LIB_ERRORS.NO_STREAM);
+    }
+
+    return toStr.call(thing).replace(/\[|\]/g, '').split(' ')[1];
+  }
+
+  function _size(something) {
+    let somethingType = _getKind.call(this, something);
+
+    if (somethingType === 'String' || somethingType === 'Array') {
+      return something.length;
+    } else {
+      Mistake().throw(CONFIG.LIB_ERRORS.UNSIZEABLE);
+    }
+  }
+
+  function _legacy(something) {
+    return something.constructor ? something.constructor.name : null;
+  }
+
+  function _makeArray(arrayLike) {
+    let arrayLikeType = _getKind.call(this, arrayLike);
 
     if (arrayLikeType === 'Array') {
       return arrayLikeType;
@@ -24,13 +50,12 @@ let Utils = (function () {
     } else if (arrayLikeType === 'String') {
       return arrayLikeType.split('');
     } else {
-      (new Mistake()).throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY_OR_STRING);
+      Mistake().throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY_OR_STRING);
     }
   }
 
-  function _each(callback) {
-    let iterable = this._stream.flush(),
-      iterableType = this.type();
+  function _each(iterable, callback) {
+    let iterableType = _getKind.call(this, iterable);
 
     if (iterableType === 'Array') {
       iterable.forEach(callback);
@@ -39,96 +64,38 @@ let Utils = (function () {
         callback(iterable[key], key);
       });
     } else {
-      (new Mistake()).throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
+      Mistake().throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
     }
   }
 
-  function _reduce(...args) {
-    let iterable = this._stream.flush(),
-      iterableType = this.type();
+  function _reduce(iterable, ...args) {
+    let iterableType = _getKind.call(this, iterable);
 
     if (iterableType === 'Array') {
       return iterable.reduce(...args);
     } else if (iterableType === 'Object') {
       // TODO: operates on Array of Object values, keys are missing. refactor this to gain keys
-      return _makeArray.call(this).reduce(...args);
+      return _makeArray.call(this, iterable).reduce(...args);
     } else {
-      (new Mistake()).throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
+      Mistake().throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
     }
   }
 
-  function _filter(...args) {
-    let iterable = this._stream.flush(),
-      iterableType = this.type();
+  function _filter(iterable, ...args) {
+    let iterableType = _getKind.call(this, iterable);
 
     if (iterableType === 'Array') {
       return iterable.filter(...args);
     } else if (iterableType === 'Object') {
       // TODO: same as reduce
-      return _makeArray.call(this).filter(...args);
+      return _makeArray.call(this, iterable).filter(...args);
     } else {
-      (new Mistake()).throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
+      Mistake().throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
     }
   }
 
-  function _checkConditions(accumulator, nextCondition) {
-    let isAccumulatorFunction = this.take(accumulator).type() === 'Function',
-      isNextConditionFunction = this.take(nextCondition).type() === 'Function';
-
-      return {
-        conditionX: isAccumulatorFunction ? accumulator() : accumulator,
-        conditionY: isNextConditionFunction ? nextCondition() : nextCondition
-      };
-  }
-
-  function _whenAll(then) {
-    let conditionList = this._stream.flush(),
-      res;
-
-    res = _reduce.call(this, (...args) => {
-      let ckecked = _checkConditions.call(this, ...args);
-
-      return ckecked.conditionX && ckecked.conditionY;
-    });
-
-    if (res) {
-      then();
-    }
-  }
-
-  function _whenAny(then) {
-    let conditionList = this._stream.flush(),
-      res;
-
-    res = _reduce.call(this, (...args) => {
-      let ckecked = _checkConditions.call(this, ...args);
-
-      return ckecked.conditionX || ckecked.conditionY;
-    });
-
-    if (res) {
-      then();
-    }
-  }
-
-  function _whenNone(then) {
-    let conditionList = this._stream.flush(),
-      res;
-
-    res = _reduce.call(this, (...args) => {
-      let ckecked = _checkConditions.call(this, ...args);
-
-      return !ckecked.conditionX && !ckecked.conditionY;
-    });
-
-    if (res) {
-      then();
-    }
-  }
-
-  function _contains(item) {
-    let box = this._stream.flush(),
-      boxType = this.type(),
+  function _contains(box, item) {
+    let boxType = _getKind.call(this, box),
       result = false;
 
     if (boxType === 'Array') {
@@ -144,15 +111,14 @@ let Utils = (function () {
         }
       }
     } else {
-      (new Mistake()).throw('Search item must be of type Array or Object, not – ' + boxType);
+      Mistake().throw('Search item must be of type Array or Object, not – ' + boxType);
     }
 
     return result;
   }
 
-  function _inspect(deeper) {
-    let obj = this._stream.flush(),
-      objType = this.take(obj).type()
+  function _inspect(obj, deeper) {
+    let objType = _getKind.call(this, obj),
       stringified;
 
       if (objType === 'Object') {
@@ -164,7 +130,7 @@ let Utils = (function () {
       }
 
     function callback(objType, val, prop) {
-      let propType = this.take(val).type();
+      let propType = _getKind.call(this, val);
 
       if (objType === 'Array') {
         if (propType === 'Object' || propType === 'Array') {
@@ -184,8 +150,7 @@ let Utils = (function () {
         }
       }
     }
-
-    this.each(obj, callback.bind(this, objType), this);
+    _each.call(this, val, callback.bind(this, objType));
     stringified = stringified.replace(/(,\s)$/, '');
     stringified += stringified.substr(0, 1) === '{' ? '}' : ']';
 
@@ -196,130 +161,134 @@ let Utils = (function () {
     return stringified;
   }
 
-  function _extend(target) {
-    _each.call(this, (val, prop) => {
+  function _extend(target, source) {
+    _each.call(this, source, (val, prop) => {
       target[prop] = val;
     });
   }
 
-  function _mixin(target) {
-    _each.call(this, (mixin) => {
-      this.take(mixin);
-      _extend.call(this, target);
-    }, this);
+  function _mixin(target, ...sources) {
+    _each.call(this, sources, (mixin) => {
+      _extend.call(this, target, mixin);
+    });
   }
 
-  function _expose(item, name) {
-    let global = this._stream.fluch();
-
+  function _expose(global, item, name) {
     global.__exposed = global.__exposed || {};
     global.__exposed[name] = item;
   }
 
-  return {
-    name: 'Utils',
-
-    take(flow) {
-      this._stream = new Stream((flow) => {
-        return flow;
-      }, flow);
-
-      return this;
+  return Object.defineProperties({}, {
+    name: {
+      value: 'Utils',
+      enumerable: true,
+      writable: false
     },
 
-    type() {
-      let toStr = Object.prototype.toString,
-        something = this._stream && this._stream.flush();
+    take: {
+      value(flow) {
+        this._stream = Stream(flow);
 
-      if (something === undefined) {
-        (new Mistake()).throw(CONFIG.LIB_ERRORS.NO_STREAM);
-      }
-
-      return toStr.call(something).replace(/\[|\]/g, '').split(' ')[1];
+        return this;
+      },
+      enumerable: true,
+      writable: false
     },
 
-    size() {
-      let somethingType = this.type(),
-        something = this._stream.flush();
-
-      if (somethingType === 'String' || somethingType === 'Array') {
-        return something.length;
-      } else {
-        (new Mistake()).throw(CONFIG.LIB_ERRORS.UNSIZEABLE);
-      }
+    getKind: {
+      value(thing) {
+        _getKind.call(this, thing);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    legacy() {
-      let something = this._stream.flush();
-
-      return something.constructor ? something.constructor.name : null;
+    size: {
+      value(something) {
+        _size.call(this, something);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    makeArray(arrayLike) {
-      this.take(arrayLike);
-      return _makeArray.call(this);
+    legacy: {
+      value(something) {
+        _legacy.call(this, something);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    each(iterable, callback, context, usePrototype) {
-      this.take(iterable);
-      _each.call(this, callback);
+    makeArray: {
+      value(arrayLike) {
+        return _makeArray.call(this, arrayLike);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    reduce(iterable, ...args) {
-      this.take(iterable);
-
-      return _reduce.call(this, ...args);
+    each: {
+      value(iterable, callback) {
+        _each.call(this, iterable, callback);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    filter(iterable, ...args) {
-      this.take(iterable);
-
-      return _filter.call(this, ...args);
+    reduce: {
+      value(iterable, ...args) {
+        return _reduce.call(this, iterable, ...args);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    whenAll(conditionList, then) {
-      this.take(conditionList);
-      _whenAll.call(this, then);
+    filter: {
+      value(iterable, ...args) {
+        return _filter.call(this, iterable, ...args);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    whenAny(conditionList, then) {
-      this.take(conditionList);
-      _whenAny.call(this, then);
+    inspect: {
+      value(obj, deeper) {
+        return _inspect.call(this, obj, deeper);
+      },
+      enumerable: true,
+      writable: false
     },
 
-    whenNone(conditionList, then) {
-      this.take(conditionList);
-      _whenNone.call(this, then);
-    },
+    unique: {
+      value(nonUnique) {
+        let i = 0,
+          j,
+          len = nonUnique.length,
+          unique = [];
 
-    inspect(obj, deeper) {
-      this.take(obj);
-      _inspect.call(this, deeper);
-    },
-
-    unique(nonUnique) {
-      let i = 0,
-        j,
-        len = nonUnique.length,
-        unique = [];
-
-        for (; i < len; i += 1) {
-          for (j = 0; j <= i; j += 1) {
-            if (unique[j] === nonUnique[i]) {
-              break;
-            } else if (j === i) {
-              unique.push(nonUnique[i]);
+          for (; i < len; i += 1) {
+            for (j = 0; j <= i; j += 1) {
+              if (unique[j] === nonUnique[i]) {
+                break;
+              } else if (j === i) {
+                unique.push(nonUnique[i]);
+              }
             }
           }
-        }
 
-      return unique;
+        return unique;
+      },
+      enumerable: true,
+      writable: false
     },
 
-    contains(box, item) {
-      this.take(box);
-      // TODO: refactor this method to make it checking for multiple items
-      return _contains.call(this, item);
+    contains: {
+      value(box, item) {
+        // TODO: refactor this method to make it checking for multiple items
+        return _contains.call(this, box, item);
+      },
+      enumerable: true,
+      writable: false
     },
 
     /*
@@ -329,9 +298,12 @@ let Utils = (function () {
     * @param {Object} extension Object by which will be do extension.
     * @return {Object} extendable Extended object.
     */
-    extend(target, source) {
-      this.take(source);
-      _extend.call(this, target);
+    extend: {
+      value(target, source) {
+        _extend.call(this, target, source);
+      },
+      enumerable: true,
+      writable: false
     },
 
     // extendDeep: function (extendable, extension) {
@@ -365,9 +337,12 @@ let Utils = (function () {
     * @param {Object} any Any number of arguments with object type.
     * @return {Object} extendable Object extended with mixins.
     */
-    mixin(target, ...args) {
-      this.take(args);
-      _mixin.call(this, target);
+    mixin: {
+      value(target, ...sources) {
+        _mixin.call(this, target, ...sources);
+      },
+      enumerable: true,
+      writable: false
     },
 
     /*
@@ -377,9 +352,12 @@ let Utils = (function () {
     * @param {Any} item Entity for expose
     * @param {String} name The name of the exposed entity
     */
-    expose(global, item, name) {
-      this.take(global);
-      _expose.call(this, item, name);
+    expose: {
+      value(global, item, name) {
+        _expose.call(this, global, item, name);
+      },
+      enumerable: true,
+      writable: false
     },
 
     /*
@@ -389,38 +367,22 @@ let Utils = (function () {
     * @param {Number} max Maximum number boundary.
     * @return {Number} randNum Random number generated.
     */
-    randomNum: function (min, max) {
+    randomNum: {
+      value(min, max) {
+      	let randNum = Math.random() * max;
 
-    	var randNum = Math.random() * max;
+      	randNum = Math.round(randNum);
 
-    	randNum = Math.round(randNum);
+      	if (randNum <= max && randNum >= min) {
+      		return randNum;
+      	}
 
-    	if (randNum <= max && randNum >= min) {
-    		return randNum;
-    	}
-
-    	return this.randomNum(min, max);
-    },
-
-    /*
-    * Creates new namespace
-    *
-    * @param {String} nsstring String representation of the desired namespace.
-    * @return {Object} this Returning created namespace object.
-    */
-    namespace: function (nsstring) {
-    	var names = nsstring.split('.'),
-    	 parent = {},
-       current = parent;
-
-      names.forEach(function (name) {
-        current[name] = {};
-        current = current[name];
-      });
-
-    	return parent;
+      	return this.randomNum(min, max);
+      },
+      enumerable: true,
+      writable: false
     }
-  };
+  });
 }());
 
 export default Utils;

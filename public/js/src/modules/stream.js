@@ -5,15 +5,20 @@
 * https://github.com/happyCoda/purrjs
 */
 
-function Stream(fn, ...args) {
-  this._fill(fn, args);
+function Stream(data) {
+  if (!(this instanceof Stream)) {
+    return new Stream(data);
+  }
+  this._fill(data);
 }
 
 Stream.prototype = Object.create(Stream.prototype, {
   _fill: {
-    value(fn, args) {
-      this.flow = fn.apply(null, args);
+    value(data) {
+      this.flow = data;
+      return this;
     },
+    enumerable: true,
     writable: false
   },
 
@@ -22,45 +27,25 @@ Stream.prototype = Object.create(Stream.prototype, {
       this.flow = fn(this.flow);
       return this;
     },
+    enumerable: true,
     writable: false
   },
 
   flush: {
-    value(fn) {
+    value() {
        return this.flow;
     },
+    enumerable: true,
     writable: false
   },
 
   refill: {
-    value(fn, ...args) {
-      this._fill(fn, args);
+    value(data) {
+      return this._fill(data);
     },
+    enumerable: true,
     writable: false
   }
 });
-
-// class Stream {
-//   constructor(fn, ...args) {
-//     this._fill(fn, args);
-//   }
-//
-//   pipe(fn) {
-//     this.flow = fn(this.flow);
-//     return this;
-//   }
-//
-//   flush() {
-//     return this.flow;
-//   }
-//
-//   _fill(fn, args) {
-//     this.flow = fn.apply(null, args);
-//   }
-//
-//   refill(fn, ...args) {
-//     this._fill(fn, args);
-//   }
-// }
 
 export default Stream;
