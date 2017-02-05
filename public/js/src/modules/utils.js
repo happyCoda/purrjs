@@ -178,6 +178,27 @@ let Utils = (function () {
     global.__exposed[name] = item;
   }
 
+  function _debounce(fn, wait, asap) {
+    let timeout;
+
+    return (..args) => {
+      function delay() {
+        if (!asap) {
+          delay.apply(null, args);
+        }
+        timeout = null;
+      }
+
+      if (timeout) {
+        clearTimeout(timeout);
+      } else if (asap) {
+        delay.apply(null, args);
+      }
+
+      timeout = setTimeout(delay, wait || 100);
+    }
+  }
+
   return Object.defineProperties({}, {
     name: {
       value: 'Utils',
@@ -355,6 +376,14 @@ let Utils = (function () {
     expose: {
       value(global, item, name) {
         _expose.call(this, global, item, name);
+      },
+      enumerable: true,
+      writable: false
+    },
+
+    debounce: {
+      value(...args) {
+        _debounce.call(this, ...args);
       },
       enumerable: true,
       writable: false
