@@ -10,7 +10,7 @@ import EventBus from './bus';
 import Mistake from './mistake';
 import CONFIG from './config';
 
-let Utils = (function () {
+let utils = (function () {
 
   // let _bus = EventBus();
 
@@ -181,7 +181,7 @@ let Utils = (function () {
   function _debounce(fn, wait, asap) {
     let timeout;
 
-    return (..args) => {
+    return (...args) => {
       function delay() {
         if (!asap) {
           delay.apply(null, args);
@@ -414,4 +414,4 @@ let Utils = (function () {
   });
 }());
 
-export default Utils;
+export default utils;

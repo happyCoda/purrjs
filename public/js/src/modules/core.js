@@ -107,6 +107,14 @@ Core.prototype = Stream(Core.prototype).pipe((_pr) => {
         },
         enumerable: true,
         writable: false
+      },
+
+      fetch: {
+        value(moduleName) {
+          return require(`./${moduleName}`);
+        },
+        enumerable: true,
+        writable: false
       }
     });
   }).pipe((_pr) => {
