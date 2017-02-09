@@ -1,8 +1,12 @@
 import utils from './utils';
+import EventBus from './bus';
 
-function makeObservable(obj) {
+const bus = new EventBus();
 
+function makeObservable(obj, cb) {
   utils.each(obj, (val, key) => {
+    bus.on(key, cb);
+
     Object.defineProperty(obj, key, {
       get() {
         return val;
@@ -11,10 +15,13 @@ function makeObservable(obj) {
         let oldVal = val;
 
         val = newVal;
-        console.log(`Object's property ${key} value has changed from ${oldVal} to ${newVal}`);
+        bus.emit(key, {
+          oldVal,
+          val
+        });
       }
     });
   });
 }
 
-export { makeObservable };
+export default makeObservable;

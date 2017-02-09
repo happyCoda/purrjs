@@ -68,6 +68,26 @@ let utils = (function () {
     }
   }
 
+  function _map(iterable, callback) {
+    let iterableType = _getKind.call(this, iterable);
+
+    if (iterableType === 'Array') {
+      return iterable.map(callback);
+    } else if (iterableType === 'Object') {
+      let iterableMapped = [];
+
+      Object.keys(iterable).forEach((key) => {
+        let newVal = callback(iterable[key], key);
+
+        iterableMapped.push(newVal);
+      });
+
+      return iterableMapped;
+    } else {
+      Mistake().throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY);
+    }
+  }
+
   function _reduce(iterable, ...args) {
     let iterableType = _getKind.call(this, iterable);
 
@@ -251,6 +271,14 @@ let utils = (function () {
     each: {
       value(iterable, callback) {
         _each.call(this, iterable, callback);
+      },
+      enumerable: true,
+      writable: false
+    },
+
+    each: {
+      value(iterable, callback) {
+        _map.call(this, iterable, callback);
       },
       enumerable: true,
       writable: false

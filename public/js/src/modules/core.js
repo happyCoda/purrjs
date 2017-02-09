@@ -9,6 +9,7 @@ import utils from './utils';
 import Stream from './stream';
 import EventBus from './bus';
 import Mistake from './mistake';
+import makeObservable from './observable';
 
 function Core () {
   if (!(this instanceof Core)) {
@@ -118,7 +119,7 @@ Core.prototype = Stream(Core.prototype).pipe((_pr) => {
       }
     });
   }).pipe((_pr) => {
-    utils.mixin(_pr, utils, Stream.prototype, EventBus.prototype, Mistake.prototype);
+    utils.mixin(_pr, utils, Stream.prototype, EventBus.prototype, Mistake.prototype, { makeObservable });
     return _pr;
   }).flush();
 
