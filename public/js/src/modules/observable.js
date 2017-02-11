@@ -17,7 +17,7 @@ function makeObservable(obj, cb) {
         val = newVal;
         bus.emit(key, {
           oldVal,
-          val
+          newVal
         });
       }
     });

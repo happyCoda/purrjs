@@ -5,15 +5,20 @@
 * https://github.com/happyCoda/purrjs
 */
 
-function Stream(data) {
-  if (!(this instanceof Stream)) {
-    return new Stream(data);
+function Plumber(data) {
+  if (!(this instanceof Plumber)) {
+    return new Plumber(data);
   }
-  this._fill(data);
+  this.push(data);
 }
 
-Stream.prototype = Object.create(Stream.prototype, {
-  _fill: {
+Plumber.prototype = Object.create(Plumber.prototype, {
+  _name: {
+    value: 'Plumber',
+    enumerable: false,
+    writable: false
+  },
+  push: {
     value(data) {
       this.flow = data;
       return this;
@@ -37,15 +42,7 @@ Stream.prototype = Object.create(Stream.prototype, {
     },
     enumerable: true,
     writable: false
-  },
-
-  refill: {
-    value(data) {
-      return this._fill(data);
-    },
-    enumerable: true,
-    writable: false
   }
 });
 
-export default Stream;
+export default Plumber;

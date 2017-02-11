@@ -5,20 +5,18 @@
 * https://github.com/happyCoda/purrjs
 */
 
-import Stream from './stream';
+import Plumber from './plumber';
 import EventBus from './bus';
 import Mistake from './mistake';
 import CONFIG from './config';
 
 let utils = (function () {
 
-  // let _bus = EventBus();
-
   function _getKind(thing) {
     let toStr = Object.prototype.toString;
 
     if (thing === undefined) {
-      Mistake().throw(CONFIG.LIB_ERRORS.NO_STREAM);
+      Mistake().throw(CONFIG.LIB_ERRORS.NO_PLUMBER);
     }
 
     return toStr.call(thing).replace(/\[|\]/g, '').split(' ')[1];
@@ -220,15 +218,15 @@ let utils = (function () {
   }
 
   return Object.defineProperties({}, {
-    name: {
+    _name: {
       value: 'Utils',
-      enumerable: true,
+      enumerable: false,
       writable: false
     },
 
     take: {
       value(flow) {
-        this._stream = Stream(flow);
+        this._plumber = Plumber(flow);
 
         return this;
       },

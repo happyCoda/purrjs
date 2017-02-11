@@ -5,11 +5,11 @@
 * https://github.com/happyCoda/purrjs
 */
 
-import utils from './utils';
-import Stream from './stream';
+import Plumber from './plumber';
 import EventBus from './bus';
 import Mistake from './mistake';
-import makeObservable from './observable';
+import utils from './utils';
+
 
 function Core () {
   if (!(this instanceof Core)) {
@@ -17,8 +17,13 @@ function Core () {
   }
 }
 
-Core.prototype = Stream(Core.prototype).pipe((_pr) => {
+Core.prototype = Plumber(Core.prototype).pipe((_pr) => {
     return Object.create(_pr, {
+      _name: {
+        value: 'Core',
+        enumerable: false,
+        writable: false
+      },
       /*
       * Creates new namespace
       *
@@ -119,7 +124,7 @@ Core.prototype = Stream(Core.prototype).pipe((_pr) => {
       }
     });
   }).pipe((_pr) => {
-    utils.mixin(_pr, utils, Stream.prototype, EventBus.prototype, Mistake.prototype, { makeObservable });
+    utils.mixin(_pr, Plumber.prototype, EventBus.prototype, Mistake.prototype);
     return _pr;
   }).flush();
 
