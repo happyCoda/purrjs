@@ -32,7 +32,7 @@ let utils = (function () {
     }
   }
 
-  function _legacy(something) {
+  function _getConstructorName(something) {
     return something.constructor ? something.constructor.name : null;
   }
 
@@ -128,6 +128,8 @@ let utils = (function () {
           break;
         }
       }
+    } else if (boxType === 'String') {
+      result = boxType.indexOf(item) === -1;
     } else {
       Mistake().throw('Search item must be of type Array or Object, not – ' + boxType);
     }
@@ -178,19 +180,36 @@ let utils = (function () {
 
     return stringified;
   }
-
+  /*
+  * Extends one object by another.
+  *
+  * @param {Object} extendable Object which will be extended.
+  * @param {Object} extension Object by which will be do extension.
+  * @return {Object} extendable Extended object.
+  */
   function _extend(target, source) {
     _each.call(this, source, (val, prop) => {
       target[prop] = val;
     });
   }
-
+  /*
+  * Allows target object to borrow functionality from source objects. Multiple inheritance.
+  *
+  * @param {Object} any Any number of arguments with object type.
+  * @return {Object} extendable Object extended with mixins.
+  */
   function _mixin(target, ...sources) {
     _each.call(this, sources, (mixin) => {
       _extend.call(this, target, mixin);
     });
   }
-
+  /*
+  * Makes any object available in global scope
+  *
+  * @param {Object} global Any global object to include exposable
+  * @param {Any} item Entity for expose
+  * @param {String} name The name of the exposed entity
+  */
   function _expose(global, item, name) {
     global.__exposed = global.__exposed || {};
     global.__exposed[name] = item;
@@ -217,20 +236,29 @@ let utils = (function () {
     }
   }
 
+  /*
+  * Generates random number
+  *
+  * @param {Number} min Minimum number boundary.
+  * @param {Number} max Maximum number boundary.
+  * @return {Number} randNum Random number generated.
+  */
+  function randomNum(min, max) {
+    let randNum = Math.random() * max;
+
+    randNum = Math.round(randNum);
+
+    if (randNum <= max && randNum >= min) {
+      return randNum;
+    }
+
+    return this.randomNum(min, max);
+  }
+
   return Object.defineProperties({}, {
     _name: {
       value: 'Utils',
       enumerable: false,
-      writable: false
-    },
-
-    take: {
-      value(flow) {
-        this._plumber = Plumber(flow);
-
-        return this;
-      },
-      enumerable: true,
       writable: false
     },
 
@@ -250,9 +278,9 @@ let utils = (function () {
       writable: false
     },
 
-    legacy: {
+    getConstructorName: {
       value(something) {
-        _legacy.call(this, something);
+        _getConstructorName.call(this, something);
       },
       enumerable: true,
       writable: false
@@ -306,45 +334,13 @@ let utils = (function () {
       writable: false
     },
 
-    unique: {
-      value(nonUnique) {
-        let i = 0,
-          j,
-          len = nonUnique.length,
-          unique = [];
-
-          for (; i < len; i += 1) {
-            for (j = 0; j <= i; j += 1) {
-              if (unique[j] === nonUnique[i]) {
-                break;
-              } else if (j === i) {
-                unique.push(nonUnique[i]);
-              }
-            }
-          }
-
-        return unique;
-      },
-      enumerable: true,
-      writable: false
-    },
-
     contains: {
       value(box, item) {
-        // TODO: refactor this method to make it checking for multiple items
         return _contains.call(this, box, item);
       },
       enumerable: true,
       writable: false
     },
-
-    /*
-    * Extends one object by another.
-    *
-    * @param {Object} extendable Object which will be extended.
-    * @param {Object} extension Object by which will be do extension.
-    * @return {Object} extendable Extended object.
-    */
     extend: {
       value(target, source) {
         _extend.call(this, target, source);
@@ -378,12 +374,6 @@ let utils = (function () {
     //   }, this);
     // },
 
-    /*
-    * Extends object by the given functionality. Multiple inheritance.
-    *
-    * @param {Object} any Any number of arguments with object type.
-    * @return {Object} extendable Object extended with mixins.
-    */
     mixin: {
       value(target, ...sources) {
         _mixin.call(this, target, ...sources);
@@ -392,13 +382,6 @@ let utils = (function () {
       writable: false
     },
 
-    /*
-    * Makes any object available in global scope
-    *
-    * @param {Object} global Any global object to include exposable
-    * @param {Any} item Entity for expose
-    * @param {String} name The name of the exposed entity
-    */
     expose: {
       value(global, item, name) {
         _expose.call(this, global, item, name);
@@ -415,24 +398,24 @@ let utils = (function () {
       writable: false
     },
 
-    /*
-    * Generates random number
-    *
-    * @param {Number} min Minimum number boundary.
-    * @param {Number} max Maximum number boundary.
-    * @return {Number} randNum Random number generated.
-    */
     randomNum: {
       value(min, max) {
-      	let randNum = Math.random() * max;
+      	return _randomNum.call(this, min, max);
+      },
+      enumerable: true,
+      writable: false
+    },
 
-      	randNum = Math.round(randNum);
-
-      	if (randNum <= max && randNum >= min) {
-      		return randNum;
-      	}
-
-      	return this.randomNum(min, max);
+    log: {
+      value(text, styles) {
+        let stylesStr = Plumber(styles)
+          .pipe(JSON.stringify)
+          .pipe((jsonStr) => {
+            return jsonStr.split(',').join(';').replace(/(\{|\}|")+/gi, '');
+          })
+          .flush();
+          
+        console.log(`%c${text}`, stylesStr);
       },
       enumerable: true,
       writable: false
