@@ -22,6 +22,17 @@ let utils = (function () {
     return toStr.call(thing).replace(/\[|\]/g, '').split(' ')[1];
   }
 
+  /*
+  * Checks if first argument equals to second.
+  *
+  * @param {Any} thing first argument you want to compare.
+  * @param {Any} other second argument you want to compare.
+  * @return {Boolean} return comparison result.
+  */
+  function _is(thing, other) {
+    return thing === other;
+  }
+
   function _size(something) {
     let somethingType = _getKind.call(this, something);
 
@@ -49,6 +60,22 @@ let utils = (function () {
       return arrayLikeType.split('');
     } else {
       Mistake().throw(CONFIG.LIB_ERRORS.OBJECT_OR_ARRAY_OR_STRING);
+    }
+  }
+
+  /*
+  * Returns the last item of the given array.
+  *
+  * @param {Array} arr Array to get tail of.
+  * @return {Any} last item of the provided array.
+  */
+  function _tail(arr) {
+    let arrLength = arr.length;
+
+    if (arrLength > 1) {
+      return arr[arrLength - 1];
+    } else {
+      return arr[0];
     }
   }
 
@@ -221,7 +248,7 @@ let utils = (function () {
     return (...args) => {
       function delay() {
         if (!asap) {
-          delay.apply(null, args);
+          delay(...args);
         }
         timeout = null;
       }
@@ -229,10 +256,22 @@ let utils = (function () {
       if (timeout) {
         clearTimeout(timeout);
       } else if (asap) {
-        delay.apply(null, args);
+        delay(...args);
       }
 
       timeout = setTimeout(delay, wait || 100);
+    }
+  }
+
+  /*
+  * Creates provided number of calls of a given function
+  *
+  * @param {Function} fn Function to call.
+  * @param {Number} repeatsNum Number of repeats.
+  */
+  function _repeat(fn, repeatsNum) {
+    for (let i = 0; i < repeatsNum; i += 1) {
+      fn();
     }
   }
 
@@ -243,7 +282,7 @@ let utils = (function () {
   * @param {Number} max Maximum number boundary.
   * @return {Number} randNum Random number generated.
   */
-  function randomNum(min, max) {
+  function _randomNum(min, max) {
     let randNum = Math.random() * max;
 
     randNum = Math.round(randNum);
@@ -264,7 +303,15 @@ let utils = (function () {
 
     getKind: {
       value(thing) {
-        _getKind.call(this, thing);
+        return _getKind.call(this, thing);
+      },
+      enumerable: true,
+      writable: false
+    },
+
+    is: {
+      value(thing, other) {
+        return _is.call(this, thing, other);
       },
       enumerable: true,
       writable: false
@@ -289,6 +336,14 @@ let utils = (function () {
     makeArray: {
       value(arrayLike) {
         return _makeArray.call(this, arrayLike);
+      },
+      enumerable: true,
+      writable: false
+    },
+
+    tail: {
+      value(arr) {
+        return _tail.call(this, arr);
       },
       enumerable: true,
       writable: false
@@ -398,6 +453,14 @@ let utils = (function () {
       writable: false
     },
 
+    repeat: {
+      value(fn, repeatsNum) {
+        _repeat.call(this, fn, repeatsNum);
+      },
+      enumerable: true,
+      writable: false
+    },
+
     randomNum: {
       value(min, max) {
       	return _randomNum.call(this, min, max);
@@ -407,15 +470,44 @@ let utils = (function () {
     },
 
     log: {
-      value(text, styles) {
-        let stylesStr = Plumber(styles)
-          .pipe(JSON.stringify)
-          .pipe((jsonStr) => {
-            return jsonStr.split(',').join(';').replace(/(\{|\}|")+/gi, '');
-          })
-          .flush();
-          
-        console.log(`%c${text}`, stylesStr);
+      value(...args) {
+        if (args.length > 1) {
+          let styles = _tail.call(this, args),
+            stylesStr = Plumber(styles)
+              .pipe(JSON.stringify)
+              .pipe((jsonStr) => {
+                return jsonStr.split(',').join(';').replace(/(\{|\}|")+/gi, '');
+              })
+              .flush();
+
+          console.log(`%c${args[0]}`, stylesStr);
+
+          //TODO: rewrite this method to work with multiple inputs
+          // if (_is.call(this, _getKind.call(this, styles), 'Object')) {
+          //   let el = document.createElement('div'),
+          //     computedStyle = getComputedStyle(el),
+          //     styleProps = Object.keys(styles).filter((key) => {
+          //       return key in computedStyle;
+          //     });
+          //
+          //   if (styleProps.length > 0) {
+          //     let stylesStr = Plumber(styles)
+          //       .pipe(JSON.stringify)
+          //       .pipe((jsonStr) => {
+          //         return jsonStr.split(',').join(';').replace(/(\{|\}|")+/gi, '');
+          //       })
+          //       .flush();
+          //
+          //     console.log(`%c${args[0]}`, stylesStr);
+          //   } else {
+          //     console.log(...args);
+          //   }
+          // } else {
+          //   console.log(...args);
+          // }
+        } else {
+          console.log(...args);
+        }
       },
       enumerable: true,
       writable: false
