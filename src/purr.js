@@ -15,11 +15,6 @@ let recursionMaxDepth = 9999;
 function _checkType(thing) {
   return Object.prototype.toString.call(thing).replace(/\[|\]|object/g, '').trim();
 }
-function _isArrayOrString(thing) {
-  let thingType = _checkType(thing);
-
-  return thingType === 'Array' || thingType === 'String';
-}
 function _throwIfNotObjectOrArrayOrString(thing) {
   _throwIfNotOneOfTypes(thing, ['Object', 'Array', 'String']);
 }
@@ -243,7 +238,7 @@ function each(collection, func) {
 function map(collection, func) {
   _throwIfNotObjectOrArrayOrString(collection);
 
-  let isObj = !_isArrayOrString(collection);
+  let isObj = isObject(collection);
   let collectionMapped = isObj ? {} : [];
 
   each(collection, (val, key) => {
@@ -261,7 +256,7 @@ function map(collection, func) {
 function reduce(collection, func, acc) {
   _throwIfNotObjectOrArrayOrString(collection);
 
-  let isObj = !_isArrayOrString(collection);
+  let isObj = isObject(collection);
   let idx = 0;
 
   each(collection, (val, key, collection, coll) => {
@@ -289,7 +284,7 @@ function filter(collection, func, reverse = false) {
 
   let result;
   let action;
-  let isObj = !_isArrayOrString(collection);
+  let isObj = isObject(collection);
 
   if (isObj) {
     result = {};
@@ -699,7 +694,6 @@ purr.ensureImplements = curry(ensureImplements);
 purr.namespace = curry(namespace);
 purr.randomNum = curry(randomNum);
 purr._checkType = _checkType;
-purr._isArrayOrString = _isArrayOrString;
 purr._throwIfNotObjectOrArrayOrString = _throwIfNotObjectOrArrayOrString;
 purr._throwIfNotObjectOrArray = _throwIfNotObjectOrArray;
 purr._throwIfNotOneOfTypes = _throwIfNotOneOfTypes;
