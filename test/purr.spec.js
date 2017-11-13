@@ -469,7 +469,7 @@ describe('purr', () => {
       purr.size(3);
     }).toThrow();
   });
-  xtest('should traverse object structure with walk', () => {
+  test('should traverse object structure with walk', () => {
     let complexObj = {
       boss: {
         name: 'John',
@@ -489,19 +489,21 @@ describe('purr', () => {
       }
     };
     let mockFn = jest.fn();
-
-    purr.walk(mockFn)(complexObj);
+    
+    purr.walk(mockFn)(null)(0)(complexObj);
     expect(mockFn).toHaveBeenCalledTimes(11);
   });
-  xtest('should traverse multidimensional arrays with walk', () => {
+  test('should flat multidimensional arrays', () => {
     let multiArr = ['boss', ['age', 'name', [{ things: 2 }]]];
-    let mockFn = jest.fn();
-    let flatArr = [];
+    // let flatArr = [];
 
-    purr.walk((val, key) => {
-      flatArr.push(val);
-    })(multiArr);
-    expect(flatArr).toEqual(7);
+    expect(purr.flatten(multiArr)).toEqual(['boss', 'age', 'name', { things: 2 }]);
+    // purr.walk((val, key, parent) => {
+    //   if (!purr.isArray(val) && !purr.isObject(parent)) {
+    //     flatArr.push(val);
+    //   }
+    // })(null)(multiArr);
+    // expect(flatArr).toEqual(['boss', 'age', 'name', { things: 2 }]);
   });
   test(`should be able to inject it's methods to other objects`, () => {
     let app = { name: 'SuperApp' };

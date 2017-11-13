@@ -4,7 +4,7 @@
   "description": "Pure JavaScript library",
   "main": "purr.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "jest && NODE_ENV=production webpack",
     "dev": "webpack",
     "test": "jest --watch"
   },

@@ -10,7 +10,7 @@
 // TODO: optimize arguments usage (toArray)
 
 
-
+let recursionMaxDepth = 9999;
 
 function _checkType(thing) {
   return Object.prototype.toString.call(thing).replace(/\[|\]|object/g, '').trim();
@@ -90,6 +90,10 @@ function _inspect(collection, deeper) {
   }
 
   return stringified;
+}
+
+function _setRecursionMaxDepth(value) {
+  recursionMaxDepth = value;
 }
 
 
@@ -560,16 +564,34 @@ function size(collection) {
   return collection.length;
 }
 
-// function walk(collection, func) {
-//   _throwIfNotOneOfTypes(collection, ['Array', 'Object']);
-//   each(collection, (val, key) => {
-//     if (isObject(val) || isArray(val)) {
-//       walk(val, func);
-//     }
-//
-//     func(val, key, collection);
-//   });
-// }
+function walk(collection, func, parent = null, depth = 0) {
+  if (depth > recursionMaxDepth) {
+    console.warn(`Maximum recusion call depth is set to ${recursionMaxDepth}, yours is ${depth}. You can reset it via purr._setRecursionMaxDepth(value)`);
+    return false;
+  }
+  _throwIfNotOneOfTypes(collection, ['Array', 'Object']);
+  each(collection, (val, key) => {
+    if (isOneOfTypes(val, ['Array', 'Object'])) {
+      walk(val, func, collection, depth + 1);
+    }
+
+    func(val, key, collection);
+  });
+}
+
+function flatten(collection) {
+  _throwIfNotOneOfTypes(collection, ['Array']);
+
+  let flatArr = [];
+
+  walk(collection, (val, key, parent) => {
+    if (!isArray(val) && !isObject(parent)) {
+      flatArr.push(val);
+    }
+  }, null, 0);
+
+  return flatArr;
+}
 
 function inject(obj, stuff) {
   _throwIfNotOneOfTypes(stuff, ['Array', 'String']);
@@ -670,7 +692,8 @@ purr.clone = curry(clone, 1);
 purr.mixin = curry(mixin);
 purr.chunk = curry(chunk, 3);
 purr.size = curry(size, 1);
-purr.walk = curry(walk);
+purr.walk = curry(walk, 4);
+purr.flatten = curry(flatten, 1);
 purr.inject = curry(inject, 2, purr);
 purr.ensureImplements = curry(ensureImplements);
 purr.namespace = curry(namespace);
@@ -682,5 +705,6 @@ purr._throwIfNotObjectOrArray = _throwIfNotObjectOrArray;
 purr._throwIfNotOneOfTypes = _throwIfNotOneOfTypes;
 purr._expose = _expose;
 purr._inspect = _inspect;
+purr._setRecursionMaxDepth = _setRecursionMaxDepth;
 
 export default purr;
