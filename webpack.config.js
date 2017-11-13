@@ -30,10 +30,11 @@ module.exports = {
         },
         open: false,
         notify: false
-      }),
-      ...(!isDev ? new webpack.optimize.UglifyJsPlugin() : [])
+      })
     ]
-  } : {}),
+  } : {
+    plugins: [new webpack.optimize.UglifyJsPlugin()]
+  }),
   watch: isDev,
   ...(isDev ? { watchOptions: { poll: 1000, ignored: /node_modules/ } } : {})
 };
