@@ -6,7 +6,6 @@
 */
 
 // TODO: add methods: where?, whereNot?, reduceRight, now
-// TODO: probably merge extend with mixin?
 // TODO: optimize arguments usage (toArray)
 
 
