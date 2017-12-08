@@ -4,3 +4,8 @@ public
 **/ubuntu-*
 npm-debug.log
 **/.DS_Store
+index.html
+css
+i
+src/app.js
+TODO.md

@@ -489,7 +489,7 @@ describe('purr', () => {
       }
     };
     let mockFn = jest.fn();
-    
+
     purr.walk(mockFn)(null)(0)(complexObj);
     expect(mockFn).toHaveBeenCalledTimes(11);
   });
